@@ -47,7 +47,7 @@ This application relies on 2 kind of users :
 - Admin : has a role Admin
 - User : is connected without Admin role.
 
-> :information_source: To use the application with Keycloak, create the Admin role and assign it to (at least) one user.
+> :information_source: To use the application with Keycloak, create the ConnectorRuntime client and Admin role and assign it to (at least) one user.
 
 ## Build and run the image
 
