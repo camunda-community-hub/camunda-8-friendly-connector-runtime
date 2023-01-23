@@ -1,0 +1,39 @@
+# https://github.com/camunda-community-hub/spring-zeebe#configuring-camunda-platform-8-saas-connection
+# https://github.com/camunda-community-hub/spring-zeebe#additional-configuration-options
+
+keycloak:
+  enabled: false
+#  auth-server-url: http://localhost:18080/auth
+#  realm: camunda-platform
+#  resource: ConnectorRuntime
+#  public-client: true
+#  principal-attribute: preferred_username
+  
+#zeebe.client.cloud:
+#  region: bru-2
+#  clusterId: xxx
+#  clientId: xxx
+#  clientSecret: xxx
+
+zeebe.client:
+  broker.gatewayAddress: 127.0.0.1:26500
+  security.plaintext: true
+
+
+spring:
+  servlet.multipart:
+    max-file-size: 10MB
+    max-request-size: 30MB
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1048576
+
+logging:
+  level:
+    root: INFO

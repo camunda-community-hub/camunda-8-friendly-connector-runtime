@@ -1,0 +1,63 @@
+package org.camunda.runtime.facade;
+
+import java.util.Map;
+import org.camunda.runtime.facade.dto.Secret;
+import org.camunda.runtime.jsonmodel.Secrets;
+import org.camunda.runtime.security.annotation.IsAdmin;
+import org.camunda.runtime.security.annotation.IsAuthenticated;
+import org.camunda.runtime.service.SecretsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@CrossOrigin
+@RestController
+@RequestMapping("/api/secrets")
+public class SecretsController extends AbstractController {
+
+  private final Logger logger = LoggerFactory.getLogger(SecretsController.class);
+
+  @Autowired private SecretsService secretsService;
+
+  @IsAuthenticated
+  @GetMapping
+  public Secrets get() {
+    Secrets anonymized = new Secrets();
+    anonymized.setPersistedOnDisk(secretsService.getSecrets().isPersistedOnDisk());
+    for (Map.Entry<String, String> keyValue : secretsService.getSecrets().entrySet()) {
+      anonymized.setSecret(keyValue.getKey(), "*".repeat(keyValue.getValue().length()));
+    }
+    return anonymized;
+  }
+
+  @IsAdmin
+  @PostMapping("/add")
+  public void setSecret(@RequestBody Secret secret) {
+    secretsService.setSecret(secret.getKey(), secret.getValue());
+  }
+
+  @IsAdmin
+  @DeleteMapping("/delete/{key}")
+  public void deleteSecret(@PathVariable String key) {
+    secretsService.removeSecret(key);
+  }
+
+  @IsAdmin
+  @PostMapping
+  public void save(@RequestBody Secrets secrets) {
+    secretsService.save(secrets);
+  }
+
+  @Override
+  public Logger getLogger() {
+    return logger;
+  }
+}
