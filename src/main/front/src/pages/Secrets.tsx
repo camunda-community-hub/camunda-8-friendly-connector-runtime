@@ -5,6 +5,9 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import Card from 'react-bootstrap/Card';
+import Modal from 'react-bootstrap/Modal';
+import Alert from 'react-bootstrap/Alert';
+import { env } from '../env';
 import { useTranslation } from "react-i18next";
 
 function Secrets() {
@@ -12,12 +15,20 @@ function Secrets() {
 
   const [secrets, setSecrets] = useState<any>(null);
   const [editSecret, setEditSecret] = useState<number>(-1);
+  const [privateKey, setPrivateKey] = useState<string | null>(null);
+  const [restorePrivateKey, setRestorePrivateKey] = useState<string>("");
+  const [status, setStatus] = useState<string | null>(null);
 
   const loadSecrets = async () => {
     if (!secrets) {
+      setStatus(await secretsService.loadStatus());
       await secretsService.loadSecrets();
       setSecrets(secretsService.secrets);
     }
+  }
+
+  const restoreSecrets = async () => {
+    setStatus(await secretsService.restoreSecrets(restorePrivateKey));
   }
 
   useEffect(() => {
@@ -29,6 +40,15 @@ function Secrets() {
     clone.persistedOnDisk = value;
     setSecrets(clone);
     secretsService.save(clone);
+  }
+  const setEncrypted = async (value: boolean) => {
+    let clone = Object.assign({}, secrets);
+    clone.encrypted = value;
+    setSecrets(clone);
+    let response = await secretsService.save(clone);
+    if (response != null) {
+      setPrivateKey(response);
+    }
   }
   const newSecret = () => {
     let clone = Object.assign({}, secrets);
@@ -68,8 +88,13 @@ function Secrets() {
             <Form.Check
               type="switch" checked={secrets.persistedOnDisk} onChange={(evt) => setPersisted(evt.target.checked)}
               label="Should be persisted on disk" />
+            {secrets.persistedOnDisk ?
+              <Form.Check
+                type="switch" checked={secrets.encrypted} onChange={(evt) => setEncrypted(evt.target.checked)}
+                label="Should be encrypted on disk" />
+              : <></>
 
-
+            }
             <Table variant="secondary" striped bordered hover>
               <thead>
                 <tr>
@@ -113,6 +138,45 @@ function Secrets() {
             </Table>
           </Card.Body>
         </Card>
+        <Modal show={privateKey != null && privateKey != ''} onHide={() => setPrivateKey(null)} animation={false} size="lg">
+            <Modal.Header closeButton>
+              <Modal.Title>{t("Private Key")}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+            <div className="row">
+              <Alert variant="info" style={{"wordWrap":"break-word"}}>
+                {privateKey}
+              </Alert>
+              <Alert variant="warning">
+                Keep this private key in a secure location. If the applications shut downs, you will be required to provide this key to restore the secrets.
+              </Alert>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+            <Button variant="primary" onClick={() => setPrivateKey(null)}>
+                {t("Close")}
+              </Button>
+            </Modal.Footer>
+        </Modal>
+        <Modal show={status != null && status.startsWith("WARNING")} animation={false} size="lg">
+          <Modal.Header>
+            <Modal.Title>{t("Private Key")}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="row">
+              <Alert variant="danger">
+                {status}
+              </Alert>
+              <InputGroup className="mb-3">
+                <InputGroup.Text>Private key</InputGroup.Text>
+                <Form.Control aria-label="privateKey" value={restorePrivateKey} onChange={(evt) => setRestorePrivateKey(evt.target.value)} />
+                <Button variant="primary" onClick={() => restoreSecrets()}>
+                  {t("Restore secrets")}
+                </Button>
+              </InputGroup>
+            </div>
+          </Modal.Body>
+        </Modal>
       </>
       : <></>
   );

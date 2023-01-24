@@ -4,12 +4,18 @@ export class SecretsService {
   loading: boolean = false;
   secrets: any = { "persistedOnDisk": true, "secrets": [] };
   errors: any | null = null;
+  loadStatus = async ():Promise<string> => {
+    let { data } = await api.get('/secrets/status');
+    console.log(data);
+    return data;
+  }
   loadSecrets = async () => {
     this.loading = true;
     try {
       const { data } = await api.get('/secrets');
 
       this.secrets.persistedOnDisk = data.persistedOnDisk;
+      this.secrets.encrypted = data.encrypted;
       this.secrets.secrets = [];
       for (const key in data.secretsKeyValues) {
         this.secrets.secrets.push({ "key": key, "value": data.secretsKeyValues[key] });
@@ -30,12 +36,14 @@ export class SecretsService {
       this.loading = false;
     }
   }
-  save = (secrets: any) => {
-    let secretConf = { "persistedOnDisk": secrets.persistedOnDisk };
-    api.post('/secrets', secretConf).then(response => {
-    }).catch(error => {
-      alert(error.message);
-    })
+  restoreSecrets = async (privateKey: string): Promise<string> => {
+    const { data } = await api.post('/secrets/restore', { "privateKey": privateKey });
+    return data;
+  }
+  save = async (secrets: any): Promise<string> => {
+    let secretConf = { "persistedOnDisk": secrets.persistedOnDisk, "encrypted": secrets.encrypted };
+    let { data } = await api.post('/secrets', secretConf);
+    return data.privateKey;
   }
   saveSecret = (index: number) => {
     api.post('/secrets/add', this.secrets.secrets[index]).then(response => {

@@ -7,6 +7,8 @@ import java.util.Set;
 public class Secrets {
 
   private boolean persistedOnDisk;
+  private boolean encrypted;
+  private byte[] publicKey;
   private Map<String, String> secretsKeyValues = new HashMap<>();
 
   public boolean isPersistedOnDisk() {
@@ -15,6 +17,22 @@ public class Secrets {
 
   public void setPersistedOnDisk(boolean persistedOnDisk) {
     this.persistedOnDisk = persistedOnDisk;
+  }
+
+  public boolean isEncrypted() {
+    return encrypted;
+  }
+
+  public void setEncrypted(boolean encrypted) {
+    this.encrypted = encrypted;
+  }
+
+  public byte[] getPublicKey() {
+    return publicKey;
+  }
+
+  public void setPublicKey(byte[] publicKey) {
+    this.publicKey = publicKey;
   }
 
   public Map<String, String> getSecretsKeyValues() {
