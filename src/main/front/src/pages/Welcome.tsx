@@ -10,7 +10,7 @@ function Welcome() {
         <div className="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">
           <div className="row welcome-header">
             <div><img src={logo} alt="Camunda" width="150px"/></div>
-            <h1>Welcome to this custom <strong>Camunda</strong> connector runtime.</h1>
+            <h1>Welcome to <strong>Camunda</strong> friendly connector runtime.</h1>
           </div>
           <div className="row">
             <div className="col-xs-12 col-sm-6">
@@ -32,7 +32,7 @@ function Welcome() {
                 <h3><a className="text-primary" href="https://github.com/camunda-community-hub"><i className="bi bi-heart"></i> Community Hub</a></h3>
             </div>
             <div className="card-pf h-m">
-                <h3><a className="text-primary" href="https://github.com/camunda-community-hub/camunda-8-connector-runtime-ui/issues"><i className="bi bi-bug"></i> Report an issue</a></h3>
+                <h3><a className="text-primary" href="https://github.com/camunda-community-hub/camunda-8-friendly-connector-runtime/issues"><i className="bi bi-bug"></i> Report an issue</a></h3>
           </div>
         </div>
       </div>

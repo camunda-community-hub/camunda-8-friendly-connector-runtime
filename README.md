@@ -2,7 +2,7 @@
 ![Compatible with: Camunda Platform 8](https://img.shields.io/badge/Compatible%20with-Camunda%20Platform%208-0072Ce)
 [![](https://img.shields.io/badge/Lifecycle-Incubating-blue)](https://github.com/Camunda-Community-Hub/community/blob/main/extension-lifecycle.md#incubating-)
 
-# UI connector runtime for Camunda Platform 8 using React, Java and Spring Boot
+# Friendly connector runtime for Camunda Platform 8 using React, Java and Spring Boot
 
 This project is made to provide a connector runtime with a simple UI to deploy, start, stop and delete connector implementations and manage secrets.
 
@@ -52,8 +52,8 @@ This application relies on 2 kind of users :
 ## Build and run the image
 
 ```
-docker build -t camunda-community/ui-connector-runtime .
+docker build -t camunda-community/friendly-connector-runtime .
 ```
 ```
-docker run -p 8888:8080 camunda-community/ui-connector-runtime
+docker run -p 8888:8080 camunda-community/friendly-connector-runtime
 ```
