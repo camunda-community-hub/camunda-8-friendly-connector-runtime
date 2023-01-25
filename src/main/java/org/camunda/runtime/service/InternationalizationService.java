@@ -2,8 +2,6 @@ package org.camunda.runtime.service;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -65,23 +63,6 @@ public class InternationalizationService {
     Files.delete(resolveTranslation(name));
   }
 
-  public JsonNode translateFormSchema(JsonNode schema, String locale) {
-    Translation t = codeTranslationMap.get(locale);
-    if (t == null) {
-      return schema;
-    }
-    JsonNode components = schema.get("components");
-    for (JsonNode node : components) {
-      if (node.get("label") != null) {
-        String label = node.get("label").asText();
-        if (t.getFormsTranslations().containsKey(label)) {
-          ((ObjectNode) node).put("label", t.getFormsTranslations().get(label));
-        }
-      }
-    }
-    return schema;
-  }
-
   @PostConstruct
   private void loadTranslations() throws IOException {
     File[] lns = Path.of(workspace).resolve(TRANSLATIONS).toFile().listFiles();
@@ -90,29 +71,6 @@ public class InternationalizationService {
         Translation translation = JsonUtils.fromJsonFile(file.toPath(), Translation.class);
         codeTranslationMap.put(translation.getCode(), translation);
       }
-    }
-    if (codeTranslationMap.isEmpty()) {
-      Map<String, String> variables =
-          Map.of(
-              "Tasks",
-              "Tasks",
-              "Processes",
-              "Processes",
-              "Open",
-              "Open",
-              "New Form",
-              "New Form",
-              "Duplicate",
-              "Duplicate",
-              "Download",
-              "Download",
-              "Delete",
-              "Delete",
-              "Save",
-              "Save");
-      Translation translation = new Translation("English", "en");
-      translation.setSiteTranslations(variables);
-      saveTranslation(translation);
     }
   }
 }

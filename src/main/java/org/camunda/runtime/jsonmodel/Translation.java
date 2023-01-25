@@ -12,7 +12,6 @@ public class Translation {
   private Date modified;
 
   private Map<String, String> siteTranslations;
-  private Map<String, String> formsTranslations;
 
   public Translation() {}
 
@@ -52,13 +51,5 @@ public class Translation {
 
   public void setSiteTranslations(Map<String, String> siteTranslations) {
     this.siteTranslations = siteTranslations;
-  }
-
-  public Map<String, String> getFormsTranslations() {
-    return formsTranslations;
-  }
-
-  public void setFormsTranslations(Map<String, String> formsTranslations) {
-    this.formsTranslations = formsTranslations;
   }
 }

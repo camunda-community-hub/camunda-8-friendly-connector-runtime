@@ -1,7 +1,7 @@
 {
   "name" : "English",
   "code" : "en",
-  "modified" : 1674475538529,
+  "modified" : 1674634845571,
   "siteTranslations" : {
     "Actions" : "Actions",
     "Back" : "Back",
@@ -31,6 +31,5 @@
     "Unsufficient privileges" : "Unsufficient privileges",
     "Users" : "Users",
     "Variables" : "Variables"
-  },
-  "formsTranslations" : { }
+  }
 }

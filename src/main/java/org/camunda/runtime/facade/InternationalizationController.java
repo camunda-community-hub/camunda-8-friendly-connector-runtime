@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.camunda.runtime.facade.dto.Language;
@@ -66,6 +67,10 @@ public class InternationalizationController {
   @GetMapping("/{ln}/{ns}.json")
   public Map<String, String> translation(@PathVariable String ln)
       throws StreamReadException, DatabindException, IOException {
-    return intlService.findByCode(ln).getSiteTranslations();
+    Translation t = intlService.findByCode(ln);
+    if (t != null) {
+      return t.getSiteTranslations();
+    }
+    return new HashMap<>();
   }
 }

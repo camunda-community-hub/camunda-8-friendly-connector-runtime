@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Date;
@@ -112,30 +113,6 @@ public class OrganizationService {
     return activeOrg.getUser(username);
   }
 
-  @PostConstruct
-  private void loadOrganizations() throws IOException {
-    File[] orgs = Path.of(workspace).resolve(ORGS).toFile().listFiles();
-    if (orgs != null) {
-      for (File file : orgs) {
-        Organization org = JsonUtils.fromJsonFile(file.toPath(), Organization.class);
-        organizations.put(org.getName(), org);
-        if (org.isActive()) {
-          activate(org.getName(), true);
-        }
-      }
-    }
-    if (organizations.isEmpty()) {
-      User demo =
-          new User("demo", "demo")
-              .setFirstname("De")
-              .setLastname("Mo")
-              .setEmail("christophe.dame@camunda.com")
-              .setProfile("Admin")
-              .addGroups("HR", "IT");
-      activeOrg = createOrganization("ACME", true, demo);
-    }
-  }
-
   public Organization createOrganization(String name, boolean active, User... users)
       throws IOException {
     Organization org =
@@ -169,5 +146,40 @@ public class OrganizationService {
       saveOrganizations();
     }
     return activeOrg;
+  }
+
+  private void createFolders() throws IOException {
+    Path wsPath = Path.of(workspace).toAbsolutePath();
+    if (!Files.exists(wsPath, LinkOption.NOFOLLOW_LINKS)) {
+      Files.createDirectory(wsPath);
+    }
+    if (!Files.exists(wsPath.resolve(ORGS), LinkOption.NOFOLLOW_LINKS)) {
+      Files.createDirectory(wsPath.resolve(ORGS));
+    }
+  }
+
+  @PostConstruct
+  private void loadOrganizations() throws IOException {
+    createFolders();
+    File[] orgs = Path.of(workspace).resolve(ORGS).toFile().listFiles();
+    if (orgs != null) {
+      for (File file : orgs) {
+        Organization org = JsonUtils.fromJsonFile(file.toPath(), Organization.class);
+        organizations.put(org.getName(), org);
+        if (org.isActive()) {
+          activate(org.getName(), true);
+        }
+      }
+    }
+    if (organizations.isEmpty()) {
+      User demo =
+          new User("demo", "demo")
+              .setFirstname("De")
+              .setLastname("Mo")
+              .setEmail("christophe.dame@camunda.com")
+              .setProfile("Admin")
+              .addGroups("HR", "IT");
+      activeOrg = createOrganization("ACME", true, demo);
+    }
   }
 }

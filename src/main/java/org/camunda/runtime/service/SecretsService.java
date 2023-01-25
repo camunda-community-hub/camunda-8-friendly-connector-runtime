@@ -3,6 +3,8 @@ package org.camunda.runtime.service;
 import io.camunda.connector.api.secret.SecretProvider;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -126,18 +128,6 @@ public class SecretsService implements SecretProvider {
     }
   }
 
-  @PostConstruct
-  private void init() throws TechnicalException {
-    if (secretsExistsOnDisk()) {
-      this.secrets = readFromDisk();
-      if (this.secrets.isEncrypted()) {
-        this.status = "WARNING : secrets need to be decrypted.";
-      }
-    } else {
-      this.secrets = new Secrets();
-    }
-  }
-
   public String restore(byte[] privateKey) {
     String test = "message to validate";
     String encrypted = CryptoUtils.encrypt(test, secrets.getPublicKey());
@@ -152,5 +142,29 @@ public class SecretsService implements SecretProvider {
     }
     this.status = "";
     return "SUCCESS : secrets have been decrypted";
+  }
+
+  private void createFolders() throws IOException {
+    Path wsPath = Path.of(workspace).toAbsolutePath();
+    if (!Files.exists(wsPath, LinkOption.NOFOLLOW_LINKS)) {
+      Files.createDirectory(wsPath);
+    }
+    if (!Files.exists(
+        wsPath.resolve(ConnectorStorageService.CONNECTORS), LinkOption.NOFOLLOW_LINKS)) {
+      Files.createDirectory(wsPath.resolve(ConnectorStorageService.CONNECTORS));
+    }
+  }
+
+  @PostConstruct
+  private void init() throws IOException, TechnicalException {
+    createFolders();
+    if (secretsExistsOnDisk()) {
+      this.secrets = readFromDisk();
+      if (this.secrets.isEncrypted()) {
+        this.status = "WARNING : secrets need to be decrypted.";
+      }
+    } else {
+      this.secrets = new Secrets();
+    }
   }
 }

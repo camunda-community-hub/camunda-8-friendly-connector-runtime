@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.camunda.runtime.exception.TechnicalException;
 import org.camunda.runtime.jsonmodel.Connector;
@@ -87,6 +89,24 @@ public class ConnectorStorageService {
       Files.delete(resolve(name));
     } catch (IOException e) {
       throw new TechnicalException("Error storing the library", e);
+    }
+  }
+
+  @PostConstruct
+  private void createFolders() throws IOException {
+    Path wsPath = Path.of(workspace).toAbsolutePath();
+    if (!Files.exists(wsPath, LinkOption.NOFOLLOW_LINKS)) {
+      Files.createDirectory(wsPath);
+    }
+    if (!Files.exists(
+        wsPath.resolve(ConnectorStorageService.CONNECTORS), LinkOption.NOFOLLOW_LINKS)) {
+      Files.createDirectory(wsPath.resolve(ConnectorStorageService.CONNECTORS));
+    }
+    if (!Files.exists(
+        wsPath.resolve(ConnectorStorageService.CONNECTORS).resolve(ConnectorStorageService.JARS),
+        LinkOption.NOFOLLOW_LINKS)) {
+      Files.createDirectory(
+          wsPath.resolve(ConnectorStorageService.CONNECTORS).resolve(ConnectorStorageService.JARS));
     }
   }
 }
