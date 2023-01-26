@@ -1,12 +1,15 @@
 {
   "name" : "Français",
   "code" : "fr",
-  "modified" : 1674475666415,
+  "modified" : 1674728484672,
   "siteTranslations" : {
     "Actions" : "Actions",
     "Back" : "Retour",
     "Close" : "Fermer",
     "Connectors" : "Connecteurs",
+    "Connectors Camunda" : "Connecteurs standards",
+    "Connector list" : "Liste des connecteurs",
+    "Connector name" : "Nom du connecteur",
     "Delete" : "Supprimer",
     "Dictionnary" : "Dictionnaire",
     "Duplicate" : "Dupliquer",
@@ -21,16 +24,21 @@
     "New translation" : "Nouvelle traduction",
     "Open" : "Ouvrir",
     "Organization name" : "Nom de l'organisation",
+    "Out of the box Connectors" : "Connecteurs Out of the box",
+    "Private Key" : "Clef privée",
+    "Restore secrets" : "Récupérer les secrets",
     "Save" : "Sauvegarder",
     "Secret key" : "Clef",
     "Secret value" : "Valeur",
     "Secrets" : "Secrets",
     "Set as active" : "Définir comme active",
+    "Should be encrypted on disk" : "Doit être crypté sur disque",
+    "Should be persisted on disk" : "Doit être stocké sur disque",
     "Status" : "Statut",
     "Stop" : "Arrêt",
     "Unsufficient privileges" : "Privilèges insuffisants",
+    "Update list" : "Mettre la liste à jour",
     "Users" : "Utilisateurs",
     "Variables" : "Variables"
-  },
-  "formsTranslations" : { }
+  }
 }
