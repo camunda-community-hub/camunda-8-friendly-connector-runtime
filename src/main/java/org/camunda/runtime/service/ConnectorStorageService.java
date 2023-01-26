@@ -3,6 +3,7 @@ package org.camunda.runtime.service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -62,17 +63,20 @@ public class ConnectorStorageService {
 
   public File storeJarFile(MultipartFile file) throws TechnicalException {
     try {
-      File target =
-          Path.of(workspace)
-              .resolve(CONNECTORS)
-              .resolve(JARS)
-              .resolve(file.getOriginalFilename())
-              .toFile();
+      return storeJarFile(file.getOriginalFilename(), file.getInputStream());
+    } catch (IOException e) {
+      throw new TechnicalException("Error storing the library", e);
+    }
+  }
+
+  public File storeJarFile(String name, InputStream content) throws TechnicalException {
+    try {
+      File target = Path.of(workspace).resolve(CONNECTORS).resolve(JARS).resolve(name).toFile();
       if (!target.exists()) {
         target.createNewFile();
       }
       try (FileOutputStream out = new FileOutputStream(target)) {
-        IOUtils.copy(file.getInputStream(), out);
+        IOUtils.copy(content, out);
       }
       return target;
     } catch (IOException e) {

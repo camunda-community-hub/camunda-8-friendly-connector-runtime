@@ -3,8 +3,10 @@ import { loadStart, loadSuccess, setCurrent, fail } from '../store/features/conn
 import api from './api';
 
 export class ConnectorService {
+  release: string = "";
+  ootbConnectors: any[] = [];
   lastFetch: number = 0;
-  getDefaultForm = ():any => {
+  getDefaultConnector = ():any => {
     return {
       name: 'New Connector',
       jobType: 'io.camunda:template:1',
@@ -12,6 +14,25 @@ export class ConnectorService {
       jarFile: '',
       started: false
     }
+  }
+  loadRelease = () => {
+    if (this.release === "") {
+      api.get<string>('/connectors/ootb/lastrelease').then(response => {
+        this.release = response.data;
+        this.loadOotbConnectors(this.release);
+      }).catch(error => {
+        alert(error.message);
+      })
+    }
+  }
+  loadOotbConnectors = async (release: string):Promise<any[]> => {
+    const { data } = await api.get<any[]>('/connectors/ootb/' + release);
+    this.ootbConnectors = data;
+    return this.ootbConnectors;
+  }
+  installOotb = async (name: string, release: string): Promise<any> => {
+    const { data } = await api.post<any>('/connectors/ootb/install', { "name": name, "release": release });
+    return data;
   }
   getConnectors = (): AppThunk => async dispatch => {
     if (this.lastFetch < Date.now() - 5000) { 
@@ -39,7 +60,7 @@ export class ConnectorService {
     return JSON.parse(JSON.stringify(store.getState().connectors.current));
   }
   new = (): AppThunk => async dispatch => {
-    dispatch(setCurrent(this.getDefaultForm()));
+    dispatch(setCurrent(this.getDefaultConnector()));
   }
   open = (name:string): AppThunk => async dispatch => {
     api.get('/connectors/' + name).then(response => {
@@ -79,7 +100,7 @@ export class ConnectorService {
     let connector = this.clone();
     api.post('/connectors', connector).then(response => {
       connector.modified = response.data.modified;
-      dispatch(setCurrent(connector));
+      dispatch(setCurrent(null));
     }).catch(error => {
       alert(error.message);
     })

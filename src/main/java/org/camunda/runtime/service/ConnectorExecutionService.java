@@ -2,8 +2,8 @@ package org.camunda.runtime.service;
 
 import io.camunda.connector.api.outbound.OutboundConnectorFunction;
 import io.camunda.connector.runtime.util.outbound.ConnectorJobHandler;
-import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.worker.JobWorker;
+import io.camunda.zeebe.spring.client.lifecycle.ZeebeClientLifecycle;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,15 +20,27 @@ import java.util.zip.ZipFile;
 import javax.annotation.PostConstruct;
 import org.camunda.runtime.exception.TechnicalException;
 import org.camunda.runtime.jsonmodel.Connector;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ConnectorExecutionService {
 
-  @Autowired private ConnectorStorageService connectorStorageService;
-  @Autowired private SecretsService secretsService;
-  @Autowired private ZeebeClient zeebeClient;
+  private ConnectorStorageService connectorStorageService;
+  private SecretsService secretsService;
+  private ZeebeClientLifecycle zeebeClient;
+  private ThreadPoolTaskScheduler scheduler;
+
+  public ConnectorExecutionService(
+      ConnectorStorageService connectorStorageService,
+      SecretsService secretsService,
+      ZeebeClientLifecycle zeebeClient,
+      ThreadPoolTaskScheduler scheduler) {
+    this.zeebeClient = zeebeClient;
+    this.secretsService = secretsService;
+    this.connectorStorageService = connectorStorageService;
+    this.scheduler = scheduler;
+  }
 
   private Map<String, JobWorker> runningWorkers = new HashMap<>();
 
@@ -43,7 +56,7 @@ public class ConnectorExecutionService {
               "META-INF/services/io.camunda.connector.api.outbound.OutboundConnectorFunction");
       InputStream serviceStream = jarFile.getInputStream(service);
       String functionName = new String(serviceStream.readAllBytes(), StandardCharsets.UTF_8);
-
+      jarFile.close();
       ClassLoader loader = URLClassLoader.newInstance(new URL[] {libFile.toURI().toURL()});
 
       Class<OutboundConnectorFunction> clazz =
@@ -89,9 +102,31 @@ public class ConnectorExecutionService {
   private void init() throws TechnicalException {
     // restart connectors that were running before the application shutdown
     List<Connector> connectors = connectorStorageService.all();
-    for (Connector connector : connectors) {
-      if (connector.isStarted()) {
-        start(connector);
+    scheduler.schedule(
+        new ConnectorStarter(connectors), new Date(System.currentTimeMillis() + 2000));
+  }
+
+  private class ConnectorStarter implements Runnable {
+
+    private List<Connector> connectors;
+
+    public ConnectorStarter(List<Connector> connectors) {
+      super();
+      this.connectors = connectors;
+    }
+
+    @Override
+    public void run() {
+      if (zeebeClient.isRunning()) {
+        for (Connector connector : connectors) {
+          if (connector.isStarted()) {
+            start(connector);
+          }
+        }
+
+      } else {
+        scheduler.schedule(
+            new ConnectorStarter(this.connectors), new Date(System.currentTimeMillis() + 2000));
       }
     }
   }

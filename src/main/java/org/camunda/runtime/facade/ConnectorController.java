@@ -1,12 +1,17 @@
 package org.camunda.runtime.facade;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.camunda.runtime.exception.TechnicalException;
+import org.camunda.runtime.facade.dto.OutOfTheBoxConnector;
 import org.camunda.runtime.jsonmodel.Connector;
 import org.camunda.runtime.security.annotation.IsAdmin;
+import org.camunda.runtime.security.annotation.IsAuthenticated;
 import org.camunda.runtime.service.ConnectorExecutionService;
 import org.camunda.runtime.service.ConnectorStorageService;
+import org.camunda.runtime.service.OutOfTheBoxConnectorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +39,7 @@ public class ConnectorController extends AbstractController {
 
   @Autowired private ConnectorExecutionService connectorExecutionService;
   @Autowired private ConnectorStorageService connectorStorageService;
+  @Autowired private OutOfTheBoxConnectorService outOfTheBoxConnectorService;
 
   @IsAdmin
   @PostMapping
@@ -96,6 +102,35 @@ public class ConnectorController extends AbstractController {
       return connector;
     }
     return null;
+  }
+
+  @IsAuthenticated
+  @GetMapping("/ootb/lastrelease")
+  public String outOfTheBoxLastRelease() {
+    return outOfTheBoxConnectorService.getLatestRelease();
+  }
+
+  @IsAuthenticated
+  @GetMapping("/ootb/{release}")
+  public List<OutOfTheBoxConnector> outOfTheBox(@PathVariable String release) {
+
+    Map<String, String> connectors = outOfTheBoxConnectorService.listConnectors(release);
+    List<OutOfTheBoxConnector> result = new ArrayList<>();
+    for (String name : connectors.keySet()) {
+      result.add(new OutOfTheBoxConnector(name, release));
+    }
+    return result;
+  }
+
+  @IsAdmin
+  @PostMapping("/ootb/install")
+  public Connector installOotb(@RequestBody OutOfTheBoxConnector outOfTheBoxConnector) {
+
+    Connector connector =
+        outOfTheBoxConnectorService.getConnector(
+            outOfTheBoxConnector.getName(), outOfTheBoxConnector.getRelease());
+
+    return connectorStorageService.save(connector);
   }
 
   @Override

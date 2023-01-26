@@ -96,10 +96,10 @@ function ConnectorEdit() {
           </Table>
           <Row>
             <Col>
-              <Button variant="primary" onClick={(evt) => save()}><i className="bi bi-send"></i> {t("Save")}</Button>
+              <Button variant="secondary" onClick={(evt) => save()}><i className="bi bi-send"></i> {t("Save")}</Button>
             </Col>
             <Col>
-              <Button variant="secondary" onClick={(evt) => close()}><i className="bi bi-close"></i> {t("Close")}</Button>
+              <Button variant="light" onClick={(evt) => close()}><i className="bi bi-close"></i> {t("Close")}</Button>
             </Col>
           </Row>
         </Card.Body>

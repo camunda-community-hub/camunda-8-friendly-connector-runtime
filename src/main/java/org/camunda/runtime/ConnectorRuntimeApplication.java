@@ -8,6 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableZeebeClient
@@ -28,5 +30,17 @@ public class ConnectorRuntimeApplication {
                         .type(SecurityScheme.Type.HTTP)
                         .scheme("bearer")
                         .bearerFormat("JWT")));
+  }
+
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
+  }
+
+  @Bean
+  public ThreadPoolTaskScheduler getScheduler() {
+    ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+    scheduler.setPoolSize(10);
+    return scheduler;
   }
 }

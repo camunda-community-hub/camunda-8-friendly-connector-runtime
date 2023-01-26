@@ -7,7 +7,6 @@ import Table from 'react-bootstrap/Table';
 import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
 import Alert from 'react-bootstrap/Alert';
-import { env } from '../env';
 import { useTranslation } from "react-i18next";
 
 function Secrets() {
@@ -87,11 +86,11 @@ function Secrets() {
 
             <Form.Check
               type="switch" checked={secrets.persistedOnDisk} onChange={(evt) => setPersisted(evt.target.checked)}
-              label="Should be persisted on disk" />
+              label={t("Should be persisted on disk")} />
             {secrets.persistedOnDisk ?
               <Form.Check
                 type="switch" checked={secrets.encrypted} onChange={(evt) => setEncrypted(evt.target.checked)}
-                label="Should be encrypted on disk" />
+                label={t("Should be encrypted on disk")} />
               : <></>
 
             }
@@ -144,11 +143,11 @@ function Secrets() {
             </Modal.Header>
             <Modal.Body>
             <div className="row">
-              <Alert variant="info" style={{"wordWrap":"break-word"}}>
-                {privateKey}
-              </Alert>
               <Alert variant="warning">
                 Keep this private key in a secure location. If the applications shut downs, you will be required to provide this key to restore the secrets.
+              </Alert>
+              <Alert variant="info" style={{"wordWrap":"break-word"}}>
+                {privateKey}
               </Alert>
               </div>
             </Modal.Body>
