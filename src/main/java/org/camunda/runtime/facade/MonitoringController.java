@@ -38,7 +38,6 @@ public class MonitoringController extends AbstractController {
 
   @IsAuthenticated
   @GetMapping("/errors/{connector}")
-  @ResponseBody
   public List<Map<String, Object>> errors(@PathVariable String connector)
       throws TechnicalException {
     return monitoringService.getErrors(connector);

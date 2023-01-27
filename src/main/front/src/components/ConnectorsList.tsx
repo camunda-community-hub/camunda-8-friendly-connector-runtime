@@ -5,9 +5,8 @@ import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
-import Card from 'react-bootstrap/Card';
 import Modal from 'react-bootstrap/Modal';
-import Alert from 'react-bootstrap/Alert';
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 function ConnectorsList() {
@@ -69,6 +68,8 @@ function ConnectorsList() {
                   <Button variant="success" onClick={() => dispatch(connectorService.start(connector.name))}><i className="bi bi-play"></i> {t("Execute")}</Button>
                 }
                 <Button variant="danger" onClick={() => dispatch(connectorService.delete(connector.name))}><i className="bi bi-trash"></i> {t("Delete")}</Button>
+
+                <Link to={"/admin/connectorErrors/" + connector.name}><i className="bi bi-bug"></i>Errors</Link>
               </td>
             </tr>)
           : <></>}

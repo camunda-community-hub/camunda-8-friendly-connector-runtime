@@ -174,3 +174,7 @@ table th {
     text-shadow: 0 0 2px black, 0 0 4px black;
     line-height: 22px;
   }
+
+.accordion-header {
+  width:100%;
+}

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Connectors from "./pages/Connectors";
+import ConnectorErrors from "./pages/ConnectorErrors";
 import Secrets from "./pages/Secrets";
 import SimpleLayout from "./SimpleLayout"
 import AdminLayout from "./AdminLayout"
@@ -44,6 +45,7 @@ function App() {
             <Route path="secrets" element={<Secrets />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="translations" element={<AdminTranslations />} />
+            <Route path="connectorErrors/*" element={<ConnectorErrors />} />
             <Route path="*" element={<Undefined />} />
           </Route>
         </Routes>

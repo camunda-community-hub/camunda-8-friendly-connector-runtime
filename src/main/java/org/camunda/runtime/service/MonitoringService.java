@@ -2,6 +2,7 @@ package org.camunda.runtime.service;
 
 import io.camunda.zeebe.client.api.response.ActivatedJob;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +47,7 @@ public class MonitoringService {
     error.put("exception", exception);
     error.put("context", job.getVariablesAsMap());
     error.put("connector", connector);
+    error.put("date", new Date());
     errors.get(connector.getName()).add(error);
   }
 
