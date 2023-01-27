@@ -20,6 +20,8 @@
     <java.version>17</java.version>
     <spring-zeebe.version>8.1.10</spring-zeebe.version>
     <zeebe.version>8.1.6</zeebe.version>
+    <!-- connector SDK version -->
+    <version.connector-core>0.4.0</version.connector-core>
   </properties>
 
   <dependencies>
@@ -65,6 +67,13 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+    
+    
+    <dependency>
+      <groupId>io.camunda.connector</groupId>
+      <artifactId>connector-validation</artifactId>
+      <version>${version.connector-core}</version>
     </dependency>
     
     <dependency>
