@@ -35,7 +35,7 @@ export class ConnectorService {
     return data;
   }
   getConnectors = (): AppThunk => async dispatch => {
-    if (this.lastFetch < Date.now() - 5000) { 
+    if (this.lastFetch < Date.now() - 500) { 
       try {
         dispatch(loadStart());
         const { data } = await api.get<any[]>('/connectors');

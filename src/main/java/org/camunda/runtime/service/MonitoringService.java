@@ -22,7 +22,7 @@ public class MonitoringService {
   private List<AuditLog> auditLogs = new ArrayList<>();
 
   private void increment(Map<String, Long> map, String key) {
-    Long count = connectorSuccess.get(key);
+    Long count = map.get(key);
     if (count == null) {
       map.put(key, 1L);
     } else {

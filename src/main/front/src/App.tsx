@@ -7,6 +7,7 @@ import Secrets from "./pages/Secrets";
 import SimpleLayout from "./SimpleLayout"
 import AdminLayout from "./AdminLayout"
 import Welcome from "./pages/Welcome";
+import Monitoring from "./pages/Monitoring";
 import Login from "./pages/Login";
 import Undefined from "./pages/Undefined";
 import AdminUsers from "./pages/AdminUsers";
@@ -37,7 +38,8 @@ function App() {
             <Route path="*" element={<Undefined />} />
           </Route>
           <Route path="admin" element={<AdminLayout />}>
-            <Route index element={<Connectors />} />
+            <Route index element={<Monitoring />} />
+            <Route path="monitoring" element={<Monitoring />} />
             <Route path="connectors" element={<Connectors />} />
             <Route path="secrets" element={<Secrets />} />
             <Route path="users" element={<AdminUsers />} />
