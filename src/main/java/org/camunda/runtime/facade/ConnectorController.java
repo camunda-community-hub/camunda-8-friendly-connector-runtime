@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 import org.camunda.runtime.exception.TechnicalException;
 import org.camunda.runtime.facade.dto.OutOfTheBoxConnector;
+import org.camunda.runtime.facade.dto.dashboard.AuditLog;
 import org.camunda.runtime.jsonmodel.Connector;
 import org.camunda.runtime.security.annotation.IsAdmin;
 import org.camunda.runtime.security.annotation.IsAuthenticated;
 import org.camunda.runtime.service.ConnectorExecutionService;
 import org.camunda.runtime.service.ConnectorStorageService;
+import org.camunda.runtime.service.MonitoringService;
 import org.camunda.runtime.service.OutOfTheBoxConnectorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +42,16 @@ public class ConnectorController extends AbstractController {
   @Autowired private ConnectorExecutionService connectorExecutionService;
   @Autowired private ConnectorStorageService connectorStorageService;
   @Autowired private OutOfTheBoxConnectorService outOfTheBoxConnectorService;
+  @Autowired private MonitoringService monitoringService;
 
   @IsAdmin
   @PostMapping
   public ResponseEntity<Connector> save(@RequestBody Connector connector)
       throws TechnicalException {
     connectorStorageService.save(connector);
+    monitoringService.addAuditLog(
+        new AuditLog("CONNECTOR SAVED", connector.getName(), getAuthenticatedUsername()));
+
     return new ResponseEntity<>(connector, HttpStatus.CREATED);
   }
 
@@ -60,6 +66,8 @@ public class ConnectorController extends AbstractController {
   @DeleteMapping("/{name}")
   public void delete(@PathVariable String name) throws TechnicalException {
     connectorStorageService.deleteByName(name);
+    monitoringService.addAuditLog(
+        new AuditLog("CONNECTOR DELETION", name, getAuthenticatedUsername()));
   }
 
   @IsAdmin
@@ -75,6 +83,8 @@ public class ConnectorController extends AbstractController {
   public Connector start(@PathVariable String name) throws TechnicalException {
     Connector connector = connectorStorageService.findByName(name);
     connectorExecutionService.start(connector);
+    monitoringService.addAuditLog(
+        new AuditLog("CONNECTOR STARTS", name, getAuthenticatedUsername()));
     return connectorStorageService.save(connector);
   }
 
@@ -84,6 +94,8 @@ public class ConnectorController extends AbstractController {
   public Connector stop(@PathVariable String name) throws TechnicalException {
     Connector connector = connectorStorageService.findByName(name);
     connectorExecutionService.stop(connector);
+    monitoringService.addAuditLog(
+        new AuditLog("CONNECTOR STOPS", name, getAuthenticatedUsername()));
     return connectorStorageService.save(connector);
   }
 
@@ -98,7 +110,9 @@ public class ConnectorController extends AbstractController {
       File target = connectorStorageService.storeJarFile(file);
 
       Connector connector = new Connector(file.getOriginalFilename(), target.getName());
-
+      monitoringService.addAuditLog(
+          new AuditLog(
+              "CONNECTOR JAR UPDATED", file.getOriginalFilename(), getAuthenticatedUsername()));
       return connector;
     }
     return null;
@@ -129,6 +143,8 @@ public class ConnectorController extends AbstractController {
     Connector connector =
         outOfTheBoxConnectorService.getConnector(
             outOfTheBoxConnector.getName(), outOfTheBoxConnector.getRelease());
+    monitoringService.addAuditLog(
+        new AuditLog("CONNECTOR INSTALLED", connector.getName(), getAuthenticatedUsername()));
 
     return connectorStorageService.save(connector);
   }

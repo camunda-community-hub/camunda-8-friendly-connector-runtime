@@ -1,7 +1,6 @@
 package org.camunda.runtime.service;
 
 import io.camunda.connector.api.outbound.OutboundConnectorFunction;
-import io.camunda.connector.runtime.util.outbound.ConnectorJobHandler;
 import io.camunda.zeebe.client.api.worker.JobWorker;
 import io.camunda.zeebe.spring.client.lifecycle.ZeebeClientLifecycle;
 import java.io.File;
@@ -18,6 +17,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.annotation.PostConstruct;
+import org.camunda.runtime.MonitoredConnectorJobHandler;
 import org.camunda.runtime.exception.TechnicalException;
 import org.camunda.runtime.jsonmodel.Connector;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -27,17 +27,20 @@ import org.springframework.stereotype.Service;
 public class ConnectorExecutionService {
 
   private ConnectorStorageService connectorStorageService;
+  private MonitoringService monitoringService;
   private SecretsService secretsService;
   private ZeebeClientLifecycle zeebeClient;
   private ThreadPoolTaskScheduler scheduler;
 
   public ConnectorExecutionService(
       ConnectorStorageService connectorStorageService,
+      MonitoringService monitoringService,
       SecretsService secretsService,
       ZeebeClientLifecycle zeebeClient,
       ThreadPoolTaskScheduler scheduler) {
     this.zeebeClient = zeebeClient;
     this.secretsService = secretsService;
+    this.monitoringService = monitoringService;
     this.connectorStorageService = connectorStorageService;
     this.scheduler = scheduler;
   }
@@ -67,7 +70,9 @@ public class ConnectorExecutionService {
           zeebeClient
               .newWorker()
               .jobType(connector.getJobType())
-              .handler(new ConnectorJobHandler(function, secretsService))
+              .handler(
+                  new MonitoredConnectorJobHandler(
+                      function, secretsService, connector, monitoringService))
               .name(connector.getName())
               .fetchVariables(connector.getFetchVariables())
               .open();
