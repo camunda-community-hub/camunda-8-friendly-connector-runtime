@@ -142,7 +142,11 @@ public class OutOfTheBoxConnectorService {
       if ("zeebe:taskDefinition:type".equals(binding.get("type").asText())) {
         connector.setJobType(prop.get("value").asText());
       } else if ("zeebe:input".equals(binding.get("type").asText())) {
-        connector.getFetchVariables().add(binding.get("name").asText());
+        String input = binding.get("name").asText();
+        String variable = input.substring(0, input.indexOf("."));
+        if (!connector.getFetchVariables().contains(variable)) {
+          connector.getFetchVariables().add(variable);
+        }
       }
     }
   }
