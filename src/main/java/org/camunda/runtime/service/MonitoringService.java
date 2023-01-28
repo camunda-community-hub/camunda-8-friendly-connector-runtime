@@ -48,7 +48,7 @@ public class MonitoringService {
     error.put("context", job.getVariablesAsMap());
     error.put("connector", connector);
     error.put("date", new Date());
-    errors.get(connector.getName()).add(error);
+    errors.get(connector.getName()).add(0, error);
   }
 
   public Map<String, SuccessFailureCount> getSuccessFailures() {
@@ -71,7 +71,7 @@ public class MonitoringService {
   }
 
   public void addAuditLog(AuditLog auditLog) {
-    auditLogs.add(auditLog);
+    auditLogs.add(0, auditLog);
   }
 
   public List<AuditLog> getAuditLogs() {
