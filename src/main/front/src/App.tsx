@@ -39,7 +39,7 @@ function App() {
             <Route path="*" element={<Undefined />} />
           </Route>
           <Route path="admin" element={<AdminLayout />}>
-            <Route index element={<Monitoring />} />
+            <Route index element={<Connectors />} />
             <Route path="monitoring" element={<Monitoring />} />
             <Route path="connectors" element={<Connectors />} />
             <Route path="secrets" element={<Secrets />} />

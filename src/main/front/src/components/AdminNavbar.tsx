@@ -49,13 +49,13 @@ function AdminNavbar() {
           <div className="bg-primary menu">
             <NavLink className={({ isActive }) =>
               isActive ? "text-light menu-item selected" : "text-light menu-item"
-            } to="/admin/monitoring">{t("Monitoring")}</NavLink>
-            <NavLink className={({ isActive }) =>
-              isActive ? "text-light menu-item selected" : "text-light menu-item"
             } to="/admin/connectors">{t("Connectors")}</NavLink>
             <NavLink className={({ isActive }) =>
               isActive ? "text-light menu-item selected" : "text-light menu-item"
             } to="/admin/secrets">{t("Secrets")}</NavLink>
+            <NavLink className={({ isActive }) =>
+              isActive ? "text-light menu-item selected" : "text-light menu-item"
+            } to="/admin/monitoring">{t("Monitoring")}</NavLink>
            
             {orgEnabled && user!.profile === 'Admin' ?
               <>
