@@ -178,3 +178,9 @@ table th {
 .accordion-header {
   width:100%;
 }
+
+tr.collapsed td > div {
+  height: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
