@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Organization } from '../store/model';
 import adminOrgService from '../service/AdminOrgService';
-import AdminGroups from './AdminGroups'
 import AdminUsers from './AdminUsers'
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -56,14 +55,7 @@ function AdminOrganization(orgParam: { organization: Organization }) {
             </Nav>
           </Col>
           <Col sm={9}>
-            <Tab.Content>
-              <Tab.Pane eventKey="users">
-                <AdminUsers organization={org} />
-              </Tab.Pane>
-              <Tab.Pane eventKey="groups">
-                <AdminGroups organization={ org }/>
-              </Tab.Pane>
-            </Tab.Content>
+            <AdminUsers organization={org} />
           </Col>
         </Row>
       </Tab.Container>

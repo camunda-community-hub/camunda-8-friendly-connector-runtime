@@ -13,6 +13,7 @@ function ConnectorsList() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
+  const user = useSelector((state: any) => state.auth.data)
   const connectors = useSelector((state: any) => state.connectors.connectors)
   const [ootbModal, setOotbModal] = useState<boolean>(false);
   const [release, setRelease] = useState<string>('');
@@ -36,7 +37,7 @@ function ConnectorsList() {
   const install = async (index: number) => {
     await connectorService.installOotb(ootbConnectors[index].name, release);
     dispatch(connectorService.getConnectors());
-    let clone:any[] = Object.assign([], ootbConnectors);
+    let clone: any[] = Object.assign([], ootbConnectors);
     clone[index].installed = true;
     setOotbConnectors(clone);
   }
@@ -48,8 +49,8 @@ function ConnectorsList() {
       <Button variant="secondary" onClick={() => openOotbModal()}><i className="bi bi-download"></i> {t("Connectors Camunda")}</Button>
 
       <Table striped bordered hover>
-		<thead>
-		  <tr>
+        <thead>
+          <tr>
             <th scope="col">{t("Name")}</th>
             <th scope="col">{t("Status")}</th>
             <th scope="col">{t("Actions")}</th>
@@ -61,19 +62,26 @@ function ConnectorsList() {
               <td>{connector.name}</td>
               <td>{connector.started ? t("Running") : t("Paused")}</td>
               <td>
-                <Button variant="primary" onClick={() => dispatch(connectorService.open(connector.name))}><i className="bi bi-pencil"></i> {t("Open")}</Button>
-                {connector.started ?
-                  <Button variant="warning" onClick={() => dispatch(connectorService.stop(connector.name))}><i className="bi bi-stop"></i> {t("Stop")}</Button>
+                {user.profile == 'Admin' ?
+                  <>
+                    <Button variant="primary" onClick={() => dispatch(connectorService.open(connector.name))}><i className="bi bi-pencil"></i> {t("Open")}</Button>
+                    {connector.started ?
+                      <Button variant="warning" onClick={() => dispatch(connectorService.stop(connector.name))}><i className="bi bi-stop"></i> {t("Stop")}</Button>
+                      :
+                      <Button variant="success" onClick={() => dispatch(connectorService.start(connector.name))}><i className="bi bi-play"></i> {t("Execute")}</Button>
+                    }
+                    <Button variant="danger" onClick={() => dispatch(connectorService.delete(connector.name))}><i className="bi bi-trash"></i> {t("Delete")}</Button>
+                  </>
                   :
-                  <Button variant="success" onClick={() => dispatch(connectorService.start(connector.name))}><i className="bi bi-play"></i> {t("Execute")}</Button>
+                  <Button variant="primary" onClick={() => dispatch(connectorService.open(connector.name))}><i className="bi bi-pencil"></i> {t("Open")}</Button>
+
                 }
-                <Button variant="danger" onClick={() => dispatch(connectorService.delete(connector.name))}><i className="bi bi-trash"></i> {t("Delete")}</Button>
 
                 <Link to={"/admin/connectorErrors/" + connector.name}><i className="bi bi-bug"></i>Errors</Link>
               </td>
             </tr>)
-          : <></>}
-		</tbody>
+            : <></>}
+        </tbody>
       </Table>
       <Modal show={ootbModal} animation={false} size="lg" onHide={() => setOotbModal(false)}>
         <Modal.Header closeButton>
@@ -118,7 +126,7 @@ function ConnectorsList() {
           </Button>
         </Modal.Footer>
       </Modal>
-  </div >
+    </div >
   );
 }
 

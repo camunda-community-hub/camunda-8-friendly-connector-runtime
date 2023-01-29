@@ -55,7 +55,7 @@ public class ConnectorController extends AbstractController {
     return new ResponseEntity<>(connector, HttpStatus.CREATED);
   }
 
-  @IsAdmin
+  @IsAuthenticated
   @GetMapping("/{name}")
   @ResponseBody
   public Connector get(@PathVariable String name) throws TechnicalException {
@@ -70,8 +70,8 @@ public class ConnectorController extends AbstractController {
         new AuditLog("CONNECTOR DELETION", name, getAuthenticatedUsername()));
   }
 
-  @IsAdmin
-  @GetMapping()
+  @IsAuthenticated
+  @GetMapping
   @ResponseBody
   public List<Connector> all() throws TechnicalException {
     return connectorStorageService.all();

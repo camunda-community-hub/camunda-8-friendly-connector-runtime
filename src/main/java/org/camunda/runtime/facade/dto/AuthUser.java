@@ -1,13 +1,10 @@
 package org.camunda.runtime.facade.dto;
 
-import java.util.Set;
-
 public class AuthUser {
   private String username;
   private String email;
   private String token;
   private String profile;
-  private Set<String> groups;
 
   public String getUsername() {
     return username;
@@ -39,13 +36,5 @@ public class AuthUser {
 
   public void setProfile(String profile) {
     this.profile = profile;
-  }
-
-  public Set<String> getGroups() {
-    return groups;
-  }
-
-  public void setGroups(Set<String> groups) {
-    this.groups = groups;
   }
 }

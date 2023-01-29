@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import secretsService from '../service/SecretsService';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
@@ -12,6 +13,7 @@ import { useTranslation } from "react-i18next";
 function Secrets() {
   const { t } = useTranslation();
 
+  const user = useSelector((state: any) => state.auth.data)
   const [secrets, setSecrets] = useState<any>(null);
   const [editSecret, setEditSecret] = useState<number>(-1);
   const [privateKey, setPrivateKey] = useState<string | null>(null);
@@ -83,23 +85,29 @@ function Secrets() {
         <Card className="bg-dark text-light">
           <Card.Body>
             <Card.Title> {t("Secrets")}</Card.Title>
-
-            <Form.Check
-              type="switch" checked={secrets.persistedOnDisk} onChange={(evt) => setPersisted(evt.target.checked)}
-              label={t("Should be persisted on disk")} />
-            {secrets.persistedOnDisk ?
-              <Form.Check
-                type="switch" checked={secrets.encrypted} onChange={(evt) => setEncrypted(evt.target.checked)}
-                label={t("Should be encrypted on disk")} />
+            {user.profile == 'Admin' ?
+              <>
+                <Form.Check
+                  type="switch" checked={secrets.persistedOnDisk} onChange={(evt) => setPersisted(evt.target.checked)}
+                  label={t("Should be persisted on disk")} />
+                {secrets.persistedOnDisk ?
+                  <Form.Check
+                    type="switch" checked={secrets.encrypted} onChange={(evt) => setEncrypted(evt.target.checked)}
+                    label={t("Should be encrypted on disk")} />
+                  : <></>
+                }
+              </>
               : <></>
-
             }
             <Table variant="secondary" striped bordered hover>
               <thead>
                 <tr>
                   <th>{t("Secret key")}</th>
                   <th>{t("Secret value")}</th>
-                  <th><Button variant="success" onClick={() => newSecret()}><i className="bi bi-plus-circle"></i></Button></th>
+                  {user.profile == 'Admin' ?
+                    <th><Button variant="success" onClick={() => newSecret()}><i className="bi bi-plus-circle"></i></Button></th>
+                    : <></>
+                  }
                 </tr>
               </thead>
               <tbody>
@@ -116,21 +124,24 @@ function Secrets() {
                       }</td>
                     <td>
                       {editSecret != index ?
-                        Array(secrets.secrets[index].value.length+1).join('*') 
+                        Array(secrets.secrets[index].value.length + 1).join('*')
                         :
                         <InputGroup className="mb-3">
                           <InputGroup.Text><i className="bi bi-keyboard"></i></InputGroup.Text>
                           <Form.Control type="password" aria-label="Varname" value={secrets.secrets[index].value} onChange={(evt) => changeSecretValue(index, evt.target.value)} />
                         </InputGroup>
                       }</td>
-                    <td>{editSecret != index ?
-                      <Button variant="success" onClick={() => setEditSecret(index)}><i className="bi bi-pencil"></i></Button>
-                      : <>
-                        <Button variant="success" onClick={() => saveSecret(index)}><i className="bi bi-check"></i></Button>
-                        <Button variant="danger" onClick={() => deleteSecret(index)}><i className="bi bi-trash"></i></Button>
-                        <Button variant="outline-success" onClick={() => setEditSecret(-1)}><i className="bi bi-box-arrow-left"></i></Button>
-                      </>
-                    }</td>
+                    {user.profile == 'Admin' ?
+                      <td>{editSecret != index ?
+                        <Button variant="success" onClick={() => setEditSecret(index)}><i className="bi bi-pencil"></i></Button>
+                        : <>
+                          <Button variant="success" onClick={() => saveSecret(index)}><i className="bi bi-check"></i></Button>
+                          <Button variant="danger" onClick={() => deleteSecret(index)}><i className="bi bi-trash"></i></Button>
+                          <Button variant="outline-success" onClick={() => setEditSecret(-1)}><i className="bi bi-box-arrow-left"></i></Button>
+                        </>
+                      }</td>
+                      : <></>
+                    }
                   </tr>
                 ) : <></>}
               </tbody>
@@ -138,24 +149,24 @@ function Secrets() {
           </Card.Body>
         </Card>
         <Modal show={privateKey != null && privateKey != ''} onHide={() => setPrivateKey(null)} animation={false} size="lg">
-            <Modal.Header closeButton>
-              <Modal.Title>{t("Private Key")}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
+          <Modal.Header closeButton>
+            <Modal.Title>{t("Private Key")}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
             <div className="row">
               <Alert variant="warning">
                 Keep this private key in a secure location. If the applications shut downs, you will be required to provide this key to restore the secrets.
               </Alert>
-              <Alert variant="info" style={{"wordWrap":"break-word"}}>
+              <Alert variant="info" style={{ "wordWrap": "break-word" }}>
                 {privateKey}
               </Alert>
-              </div>
-            </Modal.Body>
-            <Modal.Footer>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
             <Button variant="primary" onClick={() => setPrivateKey(null)}>
-                {t("Close")}
-              </Button>
-            </Modal.Footer>
+              {t("Close")}
+            </Button>
+          </Modal.Footer>
         </Modal>
         <Modal show={status != null && status.startsWith("WARNING")} animation={false} size="lg">
           <Modal.Header>

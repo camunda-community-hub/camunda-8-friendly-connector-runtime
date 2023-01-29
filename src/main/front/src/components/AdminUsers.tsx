@@ -43,37 +43,27 @@ function AdminUsers(orgParam: { organization: Organization }) {
     orgParam.organization.users[userIdx!] = user!;
     setUsers(Object.assign([], orgParam.organization.users));
   }
-  const addGroupToUSer = (group: string) => {
-    if (!orgParam.organization.users[userIdx!].groups.includes(group)) {
-      orgParam.organization.users[userIdx!].groups.push(group);
-      setUser(Object.assign({}, orgParam.organization.users[userIdx!]));
-    }
-  }
-  const deleteUserGroup = (index: number) => {
-    orgParam.organization.users[userIdx!].groups.splice(index, 1);
-    setUser(Object.assign({}, orgParam.organization.users[userIdx!]));
-  }
 
   return (
     <Row>
       <Col sm={5}>
-    <Table striped bordered hover>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Username</th>
-          <th><Button variant="success" onClick={addUser}><i className="bi bi-plus-circle"></i></Button></th>
-        </tr>
-      </thead>
-      <tbody>
-        {users ? users.map((user: IUser, index: number) =>
-          <tr key={user.username +index }>
-            <td>{index}</td>
-            <td>{user.username}</td>
-            <td><Button variant="info" onClick={() => editUser(index)}><i className="bi bi-pencil"></i></Button><Button variant="danger" onClick={() => deleteUser(index)}><i className="bi bi-trash"></i></Button></td>
-          </tr>
-        ) : <></>}
-      </tbody>
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Username</th>
+              <th><Button variant="success" onClick={addUser}><i className="bi bi-plus-circle"></i></Button></th>
+            </tr>
+          </thead>
+          <tbody>
+            {users ? users.map((user: IUser, index: number) =>
+              <tr key={user.username + index}>
+                <td>{index}</td>
+                <td>{user.username}</td>
+                <td><Button variant="info" onClick={() => editUser(index)}><i className="bi bi-pencil"></i></Button><Button variant="danger" onClick={() => deleteUser(index)}><i className="bi bi-trash"></i></Button></td>
+              </tr>
+            ) : <></>}
+          </tbody>
         </Table>
       </Col>
       <Col sm={7}>
@@ -83,7 +73,7 @@ function AdminUsers(orgParam: { organization: Organization }) {
               <Card.Title>{user.username}</Card.Title>
               <InputGroup className="mb-3">
                 <InputGroup.Text>Username</InputGroup.Text>
-                <Form.Control aria-label="Username" value={user.username} onChange={(evt) => changeUser('username', evt.target.value) } />
+                <Form.Control aria-label="Username" value={user.username} onChange={(evt) => changeUser('username', evt.target.value)} />
               </InputGroup>
               <InputGroup className="mb-3">
                 <InputGroup.Text>Firstname</InputGroup.Text>
@@ -97,22 +87,8 @@ function AdminUsers(orgParam: { organization: Organization }) {
                 <InputGroup.Text>Profile</InputGroup.Text>
                 <Form.Select aria-label="Profile" value={user.profile} onChange={(evt) => changeUser('profile', evt.target.value)}>
                   <option value="User">User</option>
-                  <option value="Editor">Editor</option>
                   <option value="Admin">Admin</option>
                 </Form.Select>
-              </InputGroup>
-
-              <InputGroup className="mb-3">
-                <DropdownButton
-                  variant="primary"
-                  title="Groups"
-                >
-                  {orgParam.organization.groups ? orgParam.organization.groups.map((group: string, index: number) =>
-                    <Dropdown.Item onClick={() =>addGroupToUSer(group)}>{group}</Dropdown.Item>) : <></>}
-                </DropdownButton>
-                <div className="userGroupList">
-                  {user ? user.groups.map((group: string, index: number) => <Badge bg="primary">{group} <i className="bi bi-x" onClick={() => deleteUserGroup(index) }></i></Badge> ) : <></>}
-                </div>
               </InputGroup>
               <InputGroup className="mb-3">
                 <InputGroup.Text>Password</InputGroup.Text>
@@ -124,7 +100,7 @@ function AdminUsers(orgParam: { organization: Organization }) {
           : <></>
         }
       </Col>
-      </Row>
+    </Row>
   );
 }
 

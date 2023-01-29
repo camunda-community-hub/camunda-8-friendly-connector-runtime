@@ -1,8 +1,5 @@
 package org.camunda.runtime.service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -46,11 +43,6 @@ public class KeycloakService {
       user.setProfile("Admin");
     } else if (roles.contains("Editor")) {
       user.setProfile("Editor");
-    }
-    Map<String, Object> otherClaims = context.getIdToken().getOtherClaims();
-    if (otherClaims.containsKey("groups")) {
-      List<String> groups = (List<String>) otherClaims.get("groups");
-      user.setGroups(new HashSet<>(groups));
     }
     return user;
   }

@@ -11,6 +11,7 @@ import java.util.Map;
 import org.camunda.runtime.facade.dto.Language;
 import org.camunda.runtime.jsonmodel.Translation;
 import org.camunda.runtime.security.annotation.IsAdmin;
+import org.camunda.runtime.security.annotation.IsAuthenticated;
 import org.camunda.runtime.service.InternationalizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,7 +53,7 @@ public class InternationalizationController {
     intlService.deleteByName(languageName);
   }
 
-  @IsAdmin
+  @IsAuthenticated
   @GetMapping(value = "/languages")
   @ResponseBody
   public List<Language> languages() {

@@ -14,6 +14,7 @@ function ConnectorEdit() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
+  const user = useSelector((state: any) => state.auth.data)
   const connector = useSelector((state: any) => state.connectors.current);
 
   const save = () => {
@@ -62,23 +63,30 @@ function ConnectorEdit() {
           <Card.Title>{connector.name}</Card.Title>
           <InputGroup className="mb-3">
             <InputGroup.Text>Name</InputGroup.Text>
-            <Form.Control aria-label="Name" placeholder="Job type" value={connector.name} onChange={(evt) => updateConnector('name', evt.target.value)} />
+            <Form.Control aria-label="Name" readOnly={user.profile != 'Admin'} placeholder="Job type" value={connector.name} onChange={(evt) => updateConnector('name', evt.target.value)} />
           </InputGroup>
           <InputGroup className="mb-3">
             <InputGroup.Text>Job type</InputGroup.Text>
-            <Form.Control aria-label="Job type" placeholder="Job type" value={connector.jobType} onChange={(evt) => updateConnector('jobType', evt.target.value)} />
+            <Form.Control aria-label="Job type" readOnly={user.profile != 'Admin'} placeholder="Job type" value={connector.jobType} onChange={(evt) => updateConnector('jobType', evt.target.value)} />
           </InputGroup>
 
           <InputGroup className="mb-3">
             <InputGroup.Text>Jar file</InputGroup.Text>
-            <Form.Control aria-label="file" type="file" id="uploadFormFileControl" onChange={loadJar} />
+            {user.profile != 'Admin' ?
+              <Form.Control aria-label="Job type" readOnly={true} placeholder="Job type" value={connector.jarFile} onChange={(evt) => updateConnector('jobType', evt.target.value)} />
+              :
+              <Form.Control aria-label="file" type="file" id="uploadFormFileControl" onChange={loadJar} />
+            }
           </InputGroup>
 
           <Table variant="secondary" striped bordered hover>
             <thead>
               <tr>
                 <th>{t("Variables")}</th>
-                <th><Button variant="success" onClick={addVariable}><i className="bi bi-plus-circle"></i></Button></th>
+                {user.profile == 'Admin' ?
+                  <th><Button variant="success" onClick={addVariable}><i className="bi bi-plus-circle"></i></Button></th>
+                  : <></>
+                }
               </tr>
             </thead>
             <tbody>
@@ -87,21 +95,27 @@ function ConnectorEdit() {
                   <td>
                     <InputGroup className="mb-3">
                       <InputGroup.Text>variable name</InputGroup.Text>
-                      <Form.Control aria-label="Varname" value={variable} onChange={(evt) => updateVar(index, evt.target.value)} />
+                      <Form.Control readOnly={user.profile != 'Admin'} aria-label="Varname" value={variable} onChange={(evt) => updateVar(index, evt.target.value)} />
                     </InputGroup></td>
-                  <td><Button variant="danger" onClick={() => deleteVar(index)}><i className="bi bi-trash"></i></Button></td>
+                  {user.profile == 'Admin' ?
+                    <td><Button variant="danger" onClick={() => deleteVar(index)}><i className="bi bi-trash"></i></Button></td>
+                    : <></>
+                  }
                 </tr>
               ) : <></>}
             </tbody>
           </Table>
-          <Row>
-            <Col>
-              <Button variant="secondary" onClick={(evt) => save()}><i className="bi bi-send"></i> {t("Save")}</Button>
-            </Col>
-            <Col>
-              <Button variant="light" onClick={(evt) => close()}><i className="bi bi-close"></i> {t("Close")}</Button>
-            </Col>
-          </Row>
+          {user.profile == 'Admin' ?
+            <Row>
+              <Col>
+                <Button variant="secondary" onClick={(evt) => save()}><i className="bi bi-send"></i> {t("Save")}</Button>
+              </Col>
+              <Col>
+                <Button variant="light" onClick={(evt) => close()}><i className="bi bi-close"></i> {t("Close")}</Button>
+              </Col>
+            </Row>
+            : <></>
+          }
         </Card.Body>
       </Card>
     </>
