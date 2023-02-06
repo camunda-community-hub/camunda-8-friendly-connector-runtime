@@ -77,7 +77,7 @@ function ConnectorsList() {
 
                 }
 
-                <Link to={"/admin/connectorErrors/" + connector.name}><i className="bi bi-bug"></i>Errors</Link>
+                <Link to={"/admin/connectorErrors/" + connector.name}><i className="bi bi-bug"></i> {t("Errors")}</Link>
               </td>
             </tr>)
             : <></>}

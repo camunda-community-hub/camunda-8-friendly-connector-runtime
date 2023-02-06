@@ -41,7 +41,8 @@ function ConnectorErrors() {
                   <tr className={showConnector ? '' : 'collapsed'}><td>Connector</td><td dangerouslySetInnerHTML={{ __html: showConnector ? JSON.stringify(error.connector, null, 2).replaceAll('\n', '<br/>').replaceAll(' ', '&nbsp;&nbsp;') : '<div>' + JSON.stringify(error.connector) + '</div>'}}></td>
                     <td onClick={() => setShowConnector(!showConnector)}><i className={showConnector ? "bi bi-arrows-collapse" : "bi bi-arrows-expand"}></i></td></tr>
                   <tr className={showVariables ? '' : 'collapsed'}><td>Variables</td><td dangerouslySetInnerHTML={{ __html: showVariables ? JSON.stringify(error.context, null, 2).replaceAll('\n', '<br/>').replaceAll(' ', '&nbsp;&nbsp;') : '<div>' + JSON.stringify(error.context) + '</div>'}}></td>
-                    <td onClick={() => setShowVariables(!showVariables)}><i className={showVariables ? "bi bi-arrows-collapse":"bi bi-arrows-expand"}></i></td></tr>
+                    <td onClick={() => setShowVariables(!showVariables)}><i className={showVariables ? "bi bi-arrows-collapse" : "bi bi-arrows-expand"}></i></td></tr>
+                  <tr><td>Duration</td><td>{ error.duration } ms</td><td></td></tr>
                 </tbody>
                </Table>
             </Accordion.Body>

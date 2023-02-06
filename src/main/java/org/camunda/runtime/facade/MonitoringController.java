@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import org.camunda.runtime.exception.TechnicalException;
 import org.camunda.runtime.facade.dto.dashboard.Dashboard;
+import org.camunda.runtime.facade.dto.dashboard.TimeStats;
 import org.camunda.runtime.security.annotation.IsAuthenticated;
 import org.camunda.runtime.service.MonitoringService;
 import org.slf4j.Logger;
@@ -38,9 +39,14 @@ public class MonitoringController extends AbstractController {
 
   @IsAuthenticated
   @GetMapping("/errors/{connector}")
-  public List<Map<String, Object>> errors(@PathVariable String connector)
-      throws TechnicalException {
+  public List<Map<String, Object>> errors(@PathVariable String connector) {
     return monitoringService.getErrors(connector);
+  }
+
+  @IsAuthenticated
+  @GetMapping("/durations/{connector}")
+  public TimeStats timeStats(@PathVariable String connector) {
+    return monitoringService.getConnectorTimeStats(connector);
   }
 
   @Override

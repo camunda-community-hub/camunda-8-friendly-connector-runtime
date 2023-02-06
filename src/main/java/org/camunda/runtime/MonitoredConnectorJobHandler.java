@@ -26,8 +26,15 @@ public class MonitoredConnectorJobHandler extends ConnectorJobHandler {
     this.monitoringService = monitoringService;
   }
 
+  @Override
+  public void handle(final JobClient client, final ActivatedJob job) {
+    monitoringService.startJob(connector, job);
+    super.handle(client, job);
+  }
+
   protected void completeJob(JobClient client, ActivatedJob job, ConnectorResult result) {
     client.newCompleteCommand(job).variables(result.getVariables()).send().join();
+    monitoringService.computeDurationStats(connector, job);
     monitoringService.addSuccess(connector);
   }
 
