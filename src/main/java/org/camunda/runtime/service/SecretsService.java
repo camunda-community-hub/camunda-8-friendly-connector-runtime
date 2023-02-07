@@ -17,11 +17,14 @@ import org.camunda.runtime.exception.TechnicalException;
 import org.camunda.runtime.jsonmodel.Secrets;
 import org.camunda.runtime.utils.CryptoUtils;
 import org.camunda.runtime.utils.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SecretsService implements SecretProvider {
+  private static final Logger LOG = LoggerFactory.getLogger(SecretsService.class);
 
   private Secrets secrets;
 
@@ -39,8 +42,8 @@ public class SecretsService implements SecretProvider {
   }
 
   public void setSecret(String key, String value) {
-    secrets.setSecret(key, value);
-    if (secrets.isPersistedOnDisk()) {
+    this.secrets.setSecret(key, value);
+    if (this.secrets.isPersistedOnDisk()) {
       persist();
     }
   }
@@ -58,6 +61,10 @@ public class SecretsService implements SecretProvider {
 
   public Secrets getSecrets() {
     return this.secrets;
+  }
+
+  public void setSecrets(Secrets secrets) {
+    this.secrets = secrets;
   }
 
   private Path resolveSecrets() {

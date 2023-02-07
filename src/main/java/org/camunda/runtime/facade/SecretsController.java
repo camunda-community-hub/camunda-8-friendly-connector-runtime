@@ -8,6 +8,7 @@ import org.camunda.runtime.jsonmodel.Secrets;
 import org.camunda.runtime.security.annotation.IsAdmin;
 import org.camunda.runtime.security.annotation.IsAuthenticated;
 import org.camunda.runtime.service.SecretsService;
+import org.camunda.runtime.service.SyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ public class SecretsController extends AbstractController {
   private final Logger logger = LoggerFactory.getLogger(SecretsController.class);
 
   @Autowired private SecretsService secretsService;
+  @Autowired private SyncService syncService;
 
   Map<String, byte[]> privateKeyMap = new HashMap<>();
 
@@ -48,12 +50,14 @@ public class SecretsController extends AbstractController {
   @PostMapping("/add")
   public void setSecret(@RequestBody Secret secret) {
     secretsService.setSecret(secret.getKey(), secret.getValue());
+    syncService.shareSecretWithOtherMembers(secretsService.getSecrets());
   }
 
   @IsAdmin
   @DeleteMapping("/delete/{key}")
   public void deleteSecret(@PathVariable String key) {
     secretsService.removeSecret(key);
+    syncService.shareSecretWithOtherMembers(secretsService.getSecrets());
   }
 
   @IsAdmin
@@ -65,10 +69,14 @@ public class SecretsController extends AbstractController {
       byte[] privateKey = secretsService.setupKeyPairs(secrets);
       secretsService.save(secrets);
       privateKeyMap.put(key, privateKey);
+
+      syncService.shareSecretWithOtherMembers(secretsService.getSecrets());
       return Map.of("privateKey", privateKey);
     }
     secretsService.save(secrets);
     privateKeyMap.clear();
+
+    syncService.shareSecretWithOtherMembers(secretsService.getSecrets());
     return Map.of("privateKey", new byte[] {});
   }
 
