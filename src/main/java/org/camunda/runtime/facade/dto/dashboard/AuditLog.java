@@ -1,8 +1,12 @@
 package org.camunda.runtime.facade.dto.dashboard;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class AuditLog {
+public class AuditLog implements Comparable<AuditLog>, Serializable {
+
+  /** Serial version UID */
+  private static final long serialVersionUID = 956425248212125625L;
 
   private String action;
   private String connector;
@@ -48,5 +52,10 @@ public class AuditLog {
 
   public void setDate(Date date) {
     this.date = date;
+  }
+
+  @Override
+  public int compareTo(AuditLog o) {
+    return -1 * this.getDate().compareTo(o.getDate());
   }
 }

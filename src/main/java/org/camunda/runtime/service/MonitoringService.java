@@ -1,30 +1,52 @@
 package org.camunda.runtime.service;
 
+import com.hazelcast.core.HazelcastInstance;
 import io.camunda.zeebe.client.api.response.ActivatedJob;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.camunda.runtime.facade.dto.ConnectorError;
 import org.camunda.runtime.facade.dto.dashboard.AuditLog;
 import org.camunda.runtime.facade.dto.dashboard.SuccessFailureCount;
 import org.camunda.runtime.facade.dto.dashboard.TimeStats;
 import org.camunda.runtime.jsonmodel.Connector;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MonitoringService {
 
-  private Long totalExecution = 0L;
-  private Map<String, Long> connectorSuccess = new HashMap<>();
-  private Map<String, Long> connectorFail = new HashMap<>();
-  private Map<String, List<Map<String, Object>>> errors = new HashMap<>();
-  private List<AuditLog> auditLogs = new ArrayList<>();
-  Map<String, TimeStats> connectorTimeStats = new HashMap<>();
+  @Autowired private HazelcastInstance hazelcastInstance;
 
   private Map<String, Long> jobStartTime = new HashMap<>();
+
+  private Map<String, Long> getGlobal() {
+    return hazelcastInstance.getMap("global");
+  }
+
+  private Map<String, Long> getConnectorSuccess() {
+    return hazelcastInstance.getMap("connectorSuccess");
+  }
+
+  private Map<String, Long> getConnectorFail() {
+    return hazelcastInstance.getMap("connectorFail");
+  }
+
+  private List<ConnectorError> getErrors(String connector) {
+    return hazelcastInstance.getList(connector + "Errors");
+  }
+
+  private List<AuditLog> getAuditLogs() {
+    return hazelcastInstance.getList("auditLogs");
+  }
+
+  private Map<String, TimeStats> getTimeStats() {
+    return hazelcastInstance.getMap("connectorTimeStats");
+  }
 
   private void increment(Map<String, Long> map, String key) {
     Long count = map.get(key);
@@ -35,39 +57,42 @@ public class MonitoringService {
     }
   }
 
+  public synchronized void incrementExecutions() {
+    Long exec = getGlobal().get("totalExecution");
+    exec = exec == null ? 0 : exec;
+    getGlobal().put("totalExecution", exec + 1);
+  }
+
   public void addSuccess(Connector connector) {
-    totalExecution++;
-    increment(connectorSuccess, connector.getName());
+    incrementExecutions();
+    increment(getConnectorSuccess(), connector.getName());
   }
 
   public void addFailure(Connector connector, ActivatedJob job, String exception) {
-    totalExecution++;
+    incrementExecutions();
     long duration =
         System.currentTimeMillis() - jobStartTime.get(connector.getName() + job.getKey());
     jobStartTime.remove(connector.getName() + job.getKey());
-    increment(connectorFail, connector.getName());
-    if (!errors.containsKey(connector.getName())) {
-      errors.put(connector.getName(), new ArrayList<>());
-    }
-    HashMap<String, Object> error = new HashMap<>();
-    error.put("duration", duration);
-    error.put("processInstance", job.getProcessInstanceKey());
-    error.put("exception", exception);
-    error.put("context", job.getVariablesAsMap());
-    error.put("connector", connector);
-    error.put("date", new Date());
-    errors.get(connector.getName()).add(0, error);
+    increment(getConnectorFail(), connector.getName());
+
+    ConnectorError error = new ConnectorError();
+    error.setDuration(duration);
+    error.setProcessInstance(job.getProcessInstanceKey());
+    error.setException(exception);
+    error.setContext(job.getVariablesAsMap());
+    error.setConnector(connector);
+    getErrors(connector.getName()).add(error);
   }
 
   public Map<String, SuccessFailureCount> getSuccessFailures() {
     Map<String, SuccessFailureCount> result = new HashMap<>();
     Set<String> connectors = new HashSet<>();
-    connectors.addAll(connectorSuccess.keySet());
-    connectors.addAll(connectorFail.keySet());
+    connectors.addAll(getConnectorSuccess().keySet());
+    connectors.addAll(getConnectorFail().keySet());
     for (String connector : connectors) {
-      Long success = connectorSuccess.get(connector);
+      Long success = getConnectorSuccess().get(connector);
       success = success != null ? success : 0L;
-      Long fail = connectorFail.get(connector);
+      Long fail = getConnectorFail().get(connector);
       fail = fail != null ? fail : 0L;
       result.put(connector, new SuccessFailureCount(success, fail));
     }
@@ -75,19 +100,25 @@ public class MonitoringService {
   }
 
   public Long getTotalExecution() {
-    return totalExecution;
+    return getGlobal().get("totalExecution");
   }
 
   public void addAuditLog(AuditLog auditLog) {
-    auditLogs.add(0, auditLog);
+    getAuditLogs().add(0, auditLog);
   }
 
-  public List<AuditLog> getAuditLogs() {
+  public List<AuditLog> getOrderedAuditLogs() {
+    List<AuditLog> auditLogs = new ArrayList<>();
+    auditLogs.addAll(getAuditLogs());
+    Collections.sort(auditLogs);
     return auditLogs;
   }
 
-  public List<Map<String, Object>> getErrors(String connector) {
-    return errors.get(connector);
+  public List<ConnectorError> getOrderErrors(String connector) {
+    List<ConnectorError> errors = new ArrayList<>();
+    errors.addAll(getErrors(connector));
+    Collections.sort(errors);
+    return errors;
   }
 
   public void startJob(Connector connector, ActivatedJob job) {
@@ -99,15 +130,15 @@ public class MonitoringService {
     Long start = jobStartTime.get(connector.getName() + job.getKey());
     jobStartTime.remove(connector.getName() + job.getKey());
     Long duration = end - start;
-    if (!connectorTimeStats.containsKey(connector.getName())) {
+    if (!getTimeStats().containsKey(connector.getName())) {
       TimeStats ts = new TimeStats();
       ts.setAvg(duration);
       ts.setCount(1L);
       ts.setFastest(duration);
       ts.setSlowest(duration);
-      connectorTimeStats.put(connector.getName(), ts);
+      getTimeStats().put(connector.getName(), ts);
     } else {
-      TimeStats ts = connectorTimeStats.get(connector.getName());
+      TimeStats ts = getTimeStats().get(connector.getName());
       ts.setAvg((ts.getAvg() * ts.getCount() + duration) / (ts.getCount() + 1));
       ts.setCount(ts.getCount() + 1);
       if (ts.getSlowest() < duration) {
@@ -116,11 +147,11 @@ public class MonitoringService {
       if (ts.getFastest() > duration) {
         ts.setFastest(duration);
       }
-      connectorTimeStats.put(connector.getName(), ts);
+      getTimeStats().put(connector.getName(), ts);
     }
   }
 
   public TimeStats getConnectorTimeStats(String connector) {
-    return connectorTimeStats.get(connector);
+    return getTimeStats().get(connector);
   }
 }

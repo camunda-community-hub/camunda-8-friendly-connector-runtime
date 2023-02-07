@@ -1,9 +1,13 @@
 package org.camunda.runtime.jsonmodel;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Connector {
+public class Connector implements Serializable {
+
+  /** Serial version UID */
+  private static final long serialVersionUID = -4172075534987185115L;
 
   private String name;
 

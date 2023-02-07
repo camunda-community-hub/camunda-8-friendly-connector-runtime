@@ -1,8 +1,8 @@
 package org.camunda.runtime.facade;
 
 import java.util.List;
-import java.util.Map;
 import org.camunda.runtime.exception.TechnicalException;
+import org.camunda.runtime.facade.dto.ConnectorError;
 import org.camunda.runtime.facade.dto.dashboard.Dashboard;
 import org.camunda.runtime.facade.dto.dashboard.TimeStats;
 import org.camunda.runtime.security.annotation.IsAuthenticated;
@@ -33,14 +33,14 @@ public class MonitoringController extends AbstractController {
     Dashboard dashboard = new Dashboard();
     dashboard.setSuccessFailures(monitoringService.getSuccessFailures());
     dashboard.setTotalExecution(monitoringService.getTotalExecution());
-    dashboard.setAuditLogs(monitoringService.getAuditLogs());
+    dashboard.setAuditLogs(monitoringService.getOrderedAuditLogs());
     return dashboard;
   }
 
   @IsAuthenticated
   @GetMapping("/errors/{connector}")
-  public List<Map<String, Object>> errors(@PathVariable String connector) {
-    return monitoringService.getErrors(connector);
+  public List<ConnectorError> errors(@PathVariable String connector) {
+    return monitoringService.getOrderErrors(connector);
   }
 
   @IsAuthenticated
