@@ -1,6 +1,11 @@
 package org.camunda.runtime.facade.dto.dashboard;
 
-public class TimeStats {
+import java.io.Serializable;
+
+public class TimeStats implements Serializable {
+
+  /** Serial verison UID */
+  private static final long serialVersionUID = -4977613642495472610L;
 
   private Long avg;
   private Long fastest;
