@@ -62,15 +62,6 @@ function ConnectorEdit() {
         <Card.Body>
           <Card.Title>{connector.name}</Card.Title>
           <InputGroup className="mb-3">
-            <InputGroup.Text>Name</InputGroup.Text>
-            <Form.Control aria-label="Name" readOnly={user.profile != 'Admin'} placeholder="Job type" value={connector.name} onChange={(evt) => updateConnector('name', evt.target.value)} />
-          </InputGroup>
-          <InputGroup className="mb-3">
-            <InputGroup.Text>Job type</InputGroup.Text>
-            <Form.Control aria-label="Job type" readOnly={user.profile != 'Admin'} placeholder="Job type" value={connector.jobType} onChange={(evt) => updateConnector('jobType', evt.target.value)} />
-          </InputGroup>
-
-          <InputGroup className="mb-3">
             <InputGroup.Text>Jar file</InputGroup.Text>
             {user.profile != 'Admin' ?
               <Form.Control aria-label="Job type" readOnly={true} placeholder="Job type" value={connector.jarFile} onChange={(evt) => updateConnector('jobType', evt.target.value)} />
@@ -78,12 +69,24 @@ function ConnectorEdit() {
               <Form.Control aria-label="file" type="file" id="uploadFormFileControl" onChange={loadJar} />
             }
           </InputGroup>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>Name</InputGroup.Text>
+            <Form.Control aria-label="Name" readOnly={user.profile != 'Admin' || !connector.jarFile} placeholder="Job type" value={connector.name} onChange={(evt) => updateConnector('name', evt.target.value)} />
+          </InputGroup>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>Service</InputGroup.Text>
+            <Form.Control aria-label="Name" readOnly={user.profile != 'Admin' || !connector.jarFile} placeholder="Job type" value={connector.service} onChange={(evt) => updateConnector('service', evt.target.value)} />
+          </InputGroup>
+          <InputGroup className="mb-3">
+            <InputGroup.Text>Job type</InputGroup.Text>
+            <Form.Control aria-label="Job type" readOnly={user.profile != 'Admin' || !connector.jarFile} placeholder="Job type" value={connector.jobType} onChange={(evt) => updateConnector('jobType', evt.target.value)} />
+          </InputGroup>
 
           <Table variant="secondary" striped bordered hover>
             <thead>
               <tr>
                 <th>{t("Variables")}</th>
-                {user.profile == 'Admin' ?
+                {user.profile == 'Admin' && connector.jarFile ?
                   <th><Button variant="success" onClick={addVariable}><i className="bi bi-plus-circle"></i></Button></th>
                   : <></>
                 }
@@ -95,9 +98,9 @@ function ConnectorEdit() {
                   <td>
                     <InputGroup className="mb-3">
                       <InputGroup.Text>variable name</InputGroup.Text>
-                      <Form.Control readOnly={user.profile != 'Admin'} aria-label="Varname" value={variable} onChange={(evt) => updateVar(index, evt.target.value)} />
+                      <Form.Control readOnly={user.profile != 'Admin' || !connector.jarFile} aria-label="Varname" value={variable} onChange={(evt) => updateVar(index, evt.target.value)} />
                     </InputGroup></td>
-                  {user.profile == 'Admin' ?
+                  {user.profile == 'Admin' && connector.jarFile ?
                     <td><Button variant="danger" onClick={() => deleteVar(index)}><i className="bi bi-trash"></i></Button></td>
                     : <></>
                   }
@@ -108,7 +111,7 @@ function ConnectorEdit() {
           {user.profile == 'Admin' ?
             <Row>
               <Col>
-                <Button variant="secondary" onClick={(evt) => save()}><i className="bi bi-send"></i> {t("Save")}</Button>
+                <Button variant="secondary" disabled={!connector.jarFile || !connector.jobType || !connector.name} onClick={(evt) => save()}><i className="bi bi-send"></i> {t("Save")}</Button>
               </Col>
               <Col>
                 <Button variant="light" onClick={(evt) => close()}><i className="bi bi-close"></i> {t("Close")}</Button>

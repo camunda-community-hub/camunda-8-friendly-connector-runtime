@@ -5,17 +5,13 @@ import io.camunda.zeebe.client.api.worker.JobWorker;
 import io.camunda.zeebe.spring.client.lifecycle.ZeebeClientLifecycle;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import javax.annotation.PostConstruct;
 import org.camunda.runtime.MonitoredConnectorJobHandler;
 import org.camunda.runtime.exception.TechnicalException;
@@ -53,20 +49,11 @@ public class ConnectorExecutionService {
       throw new TechnicalException("Jar associated to connector couldn't be found");
     }
     try {
-      ZipFile jarFile = new ZipFile(libFile);
-      ZipEntry service =
-          jarFile.getEntry(
-              "META-INF/services/io.camunda.connector.api.outbound.OutboundConnectorFunction");
-      InputStream serviceStream = jarFile.getInputStream(service);
-      String functionName = new String(serviceStream.readAllBytes(), StandardCharsets.UTF_8);
-      jarFile.close();
       Thread.currentThread().setContextClassLoader(null);
       ClassLoader loader = new URLClassLoader(new URL[] {libFile.toURI().toURL()});
-      /*new URLClassLoader(
-                    new URL[] {libFile.toURI().toURL()}, Thread.currentThread().getContextClassLoader());
-      */
+
       Class<OutboundConnectorFunction> clazz =
-          (Class<OutboundConnectorFunction>) loader.loadClass(functionName.trim());
+          (Class<OutboundConnectorFunction>) loader.loadClass(connector.getService());
 
       OutboundConnectorFunction function = clazz.getDeclaredConstructor().newInstance();
       JobWorker worker =

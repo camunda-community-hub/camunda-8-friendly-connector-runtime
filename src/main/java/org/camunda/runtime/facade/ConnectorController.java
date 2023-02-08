@@ -110,6 +110,7 @@ public class ConnectorController extends AbstractController {
       File target = connectorStorageService.storeJarFile(file);
 
       Connector connector = new Connector(file.getOriginalFilename(), target.getName());
+      connectorStorageService.fetchDetails(connector);
       monitoringService.addAuditLog(
           new AuditLog(
               "CONNECTOR JAR UPDATED", file.getOriginalFilename(), getAuthenticatedUsername()));

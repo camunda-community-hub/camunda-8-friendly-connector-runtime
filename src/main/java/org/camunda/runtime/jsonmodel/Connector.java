@@ -11,6 +11,8 @@ public class Connector implements Serializable {
 
   private String name;
 
+  private String service;
+
   private String jobType;
 
   private boolean started;
@@ -35,6 +37,18 @@ public class Connector implements Serializable {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getService() {
+    return service;
+  }
+
+  public void setService(String service) {
+    this.service = service;
+  }
+
+  public static long getSerialversionuid() {
+    return serialVersionUID;
   }
 
   public String getJobType() {

@@ -1,15 +1,22 @@
 package org.camunda.runtime.service;
 
+import com.google.common.collect.Lists;
+import io.camunda.connector.api.annotation.OutboundConnector;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import javax.annotation.PostConstruct;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.camunda.runtime.exception.TechnicalException;
@@ -111,6 +118,33 @@ public class ConnectorStorageService {
         LinkOption.NOFOLLOW_LINKS)) {
       Files.createDirectory(
           wsPath.resolve(ConnectorStorageService.CONNECTORS).resolve(ConnectorStorageService.JARS));
+    }
+  }
+
+  public void fetchDetails(Connector connector) throws TechnicalException {
+    File libFile = getJarPath(connector).toFile();
+    if (!libFile.exists()) {
+      throw new TechnicalException("Jar associated to connector couldn't be found");
+    }
+    try {
+      ZipFile jarFile = new ZipFile(libFile);
+      ZipEntry service =
+          jarFile.getEntry(
+              "META-INF/services/io.camunda.connector.api.outbound.OutboundConnectorFunction");
+      InputStream serviceStream = jarFile.getInputStream(service);
+      connector.setService(new String(serviceStream.readAllBytes(), StandardCharsets.UTF_8).trim());
+      jarFile.close();
+
+      URLClassLoader loader = new URLClassLoader(new URL[] {libFile.toURI().toURL()});
+
+      Class<?> clazz = (Class<?>) loader.loadClass(connector.getService());
+      OutboundConnector connectorAnnotation = clazz.getAnnotation(OutboundConnector.class);
+      connector.setFetchVariables(Lists.newArrayList(connectorAnnotation.inputVariables()));
+      connector.setName(connectorAnnotation.name());
+      connector.setJobType(connectorAnnotation.type());
+      loader.close();
+    } catch (IOException | ClassNotFoundException e) {
+
     }
   }
 }

@@ -98,9 +98,12 @@ public class OutOfTheBoxConnectorService {
   public Connector getConnector(String name, String release) {
     try {
       Connector connector = new Connector();
-      connector.setName(name + "-" + release);
-      getVariablesAndJobType(connector, name, release);
       connector.setJarFile(downloadMavenJar(release, name));
+      connectorStorageService.fetchDetails(connector);
+      connector.setName(name + "-" + release);
+      if (connector.getFetchVariables() == null || connector.getJobType() == null) {
+        getVariablesAndJobType(connector, name, release);
+      }
       return connector;
     } catch (Exception e) {
       return null;

@@ -9,6 +9,7 @@ export class ConnectorService {
   getDefaultConnector = ():any => {
     return {
       name: 'New Connector',
+      service: 'io.camunda.SomeConnector',
       jobType: 'io.camunda:template:1',
       fetchVariables: ['processVar1'],
       jarFile: '',
@@ -113,12 +114,8 @@ export class ConnectorService {
     let connector = this.clone();
 
     api.post('/connectors/upload', formData).then(response => {
-      connector.modified = response.data.modified;
-      connector.jarFile = response.data.jarFile;
-      if (!connector.name) {
-        connector.name = response.data.name;
-      }
-      dispatch(setCurrent(connector));
+
+      dispatch(setCurrent(response.data));
     }).catch(error => {
       alert(error.message);
     })
