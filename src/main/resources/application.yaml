@@ -20,12 +20,14 @@ zeebe.client:
   security.plaintext: true
 
 
+
 spring:
   servlet.multipart:
     max-file-size: 10MB
     max-request-size: 30MB
 server:
   port: 8085
+  socketPort: 5000
   error:
     whitelabel:
       enabled: false

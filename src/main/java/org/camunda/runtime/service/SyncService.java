@@ -34,7 +34,7 @@ public class SyncService {
   public static final String SHARE_SECRETS = "sharesecrets:";
   public static final String UPDATE_SECRETS = "updatesecrets:";
 
-  @Value("${server.socketPort}")
+  @Value("${server.socketPort:5000}")
   private Integer port;
 
   @Autowired private SecretsService secretsService;
