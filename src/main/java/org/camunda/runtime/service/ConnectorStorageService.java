@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -128,20 +128,26 @@ public class ConnectorStorageService {
     }
     try {
       ZipFile jarFile = new ZipFile(libFile);
-      ZipEntry service =
-          jarFile.getEntry(
-              "META-INF/services/io.camunda.connector.api.outbound.OutboundConnectorFunction");
-      InputStream serviceStream = jarFile.getInputStream(service);
-      connector.setService(new String(serviceStream.readAllBytes(), StandardCharsets.UTF_8).trim());
-      jarFile.close();
+      Enumeration<? extends ZipEntry> entries = jarFile.entries();
 
       URLClassLoader loader = new URLClassLoader(new URL[] {libFile.toURI().toURL()});
 
-      Class<?> clazz = (Class<?>) loader.loadClass(connector.getService());
-      OutboundConnector connectorAnnotation = clazz.getAnnotation(OutboundConnector.class);
-      connector.setFetchVariables(Lists.newArrayList(connectorAnnotation.inputVariables()));
-      connector.setName(connectorAnnotation.name());
-      connector.setJobType(connectorAnnotation.type());
+      while (connector.getService() == null && entries.hasMoreElements()) {
+        ZipEntry entry = entries.nextElement();
+        String entryName = entry.getName();
+        if (entryName != null && entryName.endsWith(".class")) {
+          String className = entryName.replace(".class", "").replace('/', '.');
+          Class<?> clazz = (Class<?>) loader.loadClass(className);
+          OutboundConnector connectorAnnotation = clazz.getAnnotation(OutboundConnector.class);
+          if (connectorAnnotation != null) {
+            connector.setService(className);
+            connector.setFetchVariables(Lists.newArrayList(connectorAnnotation.inputVariables()));
+            connector.setName(connectorAnnotation.name());
+            connector.setJobType(connectorAnnotation.type());
+          }
+        }
+      }
+      jarFile.close();
       loader.close();
     } catch (IOException | ClassNotFoundException e) {
 
