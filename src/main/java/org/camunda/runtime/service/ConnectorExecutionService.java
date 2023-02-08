@@ -60,10 +60,11 @@ public class ConnectorExecutionService {
       InputStream serviceStream = jarFile.getInputStream(service);
       String functionName = new String(serviceStream.readAllBytes(), StandardCharsets.UTF_8);
       jarFile.close();
-      ClassLoader loader =
-          new URLClassLoader(
-              new URL[] {libFile.toURI().toURL()}, Thread.currentThread().getContextClassLoader());
-
+      Thread.currentThread().setContextClassLoader(null);
+      ClassLoader loader = new URLClassLoader(new URL[] {libFile.toURI().toURL()});
+      /*new URLClassLoader(
+                    new URL[] {libFile.toURI().toURL()}, Thread.currentThread().getContextClassLoader());
+      */
       Class<OutboundConnectorFunction> clazz =
           (Class<OutboundConnectorFunction>) loader.loadClass(functionName.trim());
 
