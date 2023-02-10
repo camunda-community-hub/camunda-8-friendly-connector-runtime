@@ -64,7 +64,7 @@ function ConnectorEdit() {
           <InputGroup className="mb-3">
             <InputGroup.Text>Jar file</InputGroup.Text>
             {user.profile != 'Admin' ?
-              <Form.Control aria-label="Job type" readOnly={true} placeholder="Job type" value={connector.jarFile} onChange={(evt) => updateConnector('jobType', evt.target.value)} />
+              <Form.Control aria-label="Job type" readOnly={true} placeholder="Job type" value={connector.jarFile} />
               :
               <Form.Control aria-label="file" type="file" id="uploadFormFileControl" onChange={loadJar} />
             }
@@ -108,17 +108,18 @@ function ConnectorEdit() {
               ) : <></>}
             </tbody>
           </Table>
-          {user.profile == 'Admin' ?
+         
             <Row>
-              <Col>
+            <Col>
+              {user.profile == 'Admin' ?
                 <Button variant="secondary" disabled={!connector.jarFile || !connector.jobType || !connector.name} onClick={(evt) => save()}><i className="bi bi-send"></i> {t("Save")}</Button>
+                : <></>
+              }
               </Col>
               <Col>
                 <Button variant="light" onClick={(evt) => close()}><i className="bi bi-close"></i> {t("Close")}</Button>
               </Col>
             </Row>
-            : <></>
-          }
         </Card.Body>
       </Card>
     </>

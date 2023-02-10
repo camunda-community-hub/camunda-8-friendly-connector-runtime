@@ -1,34 +1,46 @@
 body {
   overflow: hidden;
 }
+
 .main {
   overflow: auto;
   height: calc(100vh - 95px);
 }
+
 .navbar {
   height: 95px;
 }
-.navbar.reduced {
-  height: 65px;
-}
+
+  .navbar.reduced {
+    height: 65px;
+  }
+
 .nav-tabs {
-    background: #eee;
+  background: #eee;
 }
+
 .menu {
   width: 100vw;
   height: 33px;
-  padding-left:10px;
+  padding-left: 10px;
 }
+
+.accordion-button.collapsed {
+  background: #CCD;
+}
+
 a.text-light.menu-item {
   padding: 0px 10px;
   text-decoration: none;
   border-right: 1px solid;
   line-height: 32px;
 }
-a.text-light.menu-item.selected {
-  background-color: rgba(255,255,255,0.4);
-  box-shadow: 0 0 0 0.25rem rgba(255,255,255,0.2);
-}
+
+  a.text-light.menu-item.selected {
+    background-color: rgba(255,255,255,0.4);
+    box-shadow: 0 0 0 0.25rem rgba(255,255,255,0.2);
+  }
+
 #sidebar-nav {
   height: calc(100vh - 95px);
   padding: 10px;
@@ -50,18 +62,20 @@ main {
 }
 
 h2 {
-    display: inline-block;
-    font-size: .9rem;
-    position: relative;
-    line-height: 1.5;
-    letter-spacing: .1rem;
-    text-transform: uppercase;
-    font-weight: 600;
-    margin-bottom: 20px;
+  display: inline-block;
+  font-size: .9rem;
+  position: relative;
+  line-height: 1.5;
+  letter-spacing: .1rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 20px;
 }
+
 .mainContent span.input-group-text:first-child {
-    width: 106px;
+  width: 106px;
 }
+
 table th {
   font-size: 1.1rem;
   font-weight: 500;
@@ -72,61 +86,70 @@ table th {
 }
 
 .logout {
-    font-size: 16px;
-    font-weight: 700;
-    border-left: 1px solid #17428c;
-    padding-left: 10px;
-    margin-left: 10px;
-}
-.logout::before {
-    font-size: 20px;
-    font-weight: 400!important;
+  font-size: 16px;
+  font-weight: 700;
+  border-left: 1px solid #17428c;
+  padding-left: 10px;
+  margin-left: 10px;
 }
 
+  .logout::before {
+    font-size: 20px;
+    font-weight: 400 !important;
+  }
+
 .card {
-	margin-bottom: 5px;
+  margin-bottom: 5px;
 }
+
 .card-title {
-	font-size: 1.1rem;
+  font-size: 1.1rem;
 }
 
 .card-subtitle {
-    font-size: 0.9rem;
+  font-size: 0.9rem;
 }
+
 .card-text {
-	float: left;
-    font-size: 12px;
-    margin-bottom: 0!important;
-    margin-block-start: 0;
+  float: left;
+  font-size: 12px;
+  margin-bottom: 0 !important;
+  margin-block-start: 0;
 }
+
 .card-link {
-	float: right;
+  float: right;
 }
 
 .localeDropdown {
-	display:inline-block;
+  display: inline-block;
 }
-.localeDropdown > button {
-	font-size: 1.1rem;
-    border:0px;
-}
+
+  .localeDropdown > button {
+    font-size: 1.1rem;
+    border: 0px;
+  }
+
 .dropdown-menu {
-	box-shadow: -2px 2px 3px #666;
+  box-shadow: -2px 2px 3px #666;
 }
+
 .dropdown-toggle.move[aria-expanded="false"]::after {
-    transform: rotate(-90deg);
-    transition: transform 0.35s ease;
+  transform: rotate(-90deg);
+  transition: transform 0.35s ease;
 }
 
 
 .addOrg {
   position: absolute;
   right: 10px;
-  margin-top:2px;
+  margin-top: 2px;
 }
+
 .userGroupList {
   flex: 1 1;
 }
+
 @media only screen and (max-width: 600px) {
   .fileViewer .modal-dialog {
     max-width: 100vw;
@@ -152,6 +175,7 @@ table th {
   border-radius: 15px;
   overflow: hidden;
 }
+
   .execChart > .success {
     background: repeating-linear-gradient(45deg, transparent, transparent 10px, #080 10px, #080 20px), linear-gradient(to bottom, #0E0, #070);
     display: inline-block;
@@ -163,6 +187,7 @@ table th {
     text-shadow: 0 0 2px black, 0 0 4px black;
     line-height: 22px;
   }
+
   .execChart > .failure {
     background: repeating-linear-gradient(45deg, transparent, transparent 10px, #800 10px, #800 20px), linear-gradient(to bottom, #E00, #700);
     display: inline-block;
@@ -176,7 +201,7 @@ table th {
   }
 
 .accordion-header {
-  width:100%;
+  width: 100%;
 }
 
 tr.collapsed td > div {
@@ -184,3 +209,49 @@ tr.collapsed td > div {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/*elements templates*/
+.elementTemplate {
+  margin-left: -12px;
+  margin-right: -12px;
+  width: 100vw;
+  height: 100%;
+}
+
+
+  .elementTemplate .templateEditor {
+    width: calc(100vw - 400px);
+    height: 100%;
+    max-height: 100%;
+    display: inline-block;
+    float: left;
+    overflow-y: auto;
+  }
+  .elementTemplate .templateEditor .downloadJson {
+    position: absolute;
+    right: 400px;
+    margin: 2px;
+  }
+
+  .elementTemplate .templateEditor .templateProperty0 {
+    display: none;
+  }
+
+  .elementTemplate .diagram {
+    display: none;
+  }
+
+  .elementTemplate .panel {
+    width: 400px;
+    height: 100%;
+    display: flex;
+    float: left;
+  }
+
+    .elementTemplate .panel > .bio-properties-panel-container {
+      width: 400px;
+    }
+
+    .elementTemplate .panel .bio-properties-panel-group[data-group-id='group-ElementTemplates__Template'] .bio-properties-panel-dropdown-button {
+      display: none;
+    }

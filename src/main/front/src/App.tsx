@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Connectors from "./pages/Connectors";
 import ConnectorErrors from "./pages/ConnectorErrors";
+import ElementTemplate from "./pages/ElementTemplate";
 import Secrets from "./pages/Secrets";
 import SimpleLayout from "./SimpleLayout"
 import AdminLayout from "./AdminLayout"
@@ -15,6 +16,8 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminTranslations from "./pages/AdminTranslations";
 import './assets/css/bootstrap.min.css';
 import './assets/css/bootstrap-icons-1.7.2.css';
+import 'camunda-bpmn-js/dist/assets/properties-panel.css';
+import 'camunda-bpmn-js/dist/assets/element-templates.css';
 import './assets/css/custom.css';
 import './assets/css/login.css';
 import './assets/css/customBootstrap.css';
@@ -46,6 +49,7 @@ function App() {
             <Route path="users" element={<AdminUsers />} />
             <Route path="translations" element={<AdminTranslations />} />
             <Route path="connectorErrors/*" element={<ConnectorErrors />} />
+            <Route path="elementTemplate" element={<ElementTemplate />} />
             <Route path="*" element={<Undefined />} />
           </Route>
         </Routes>
