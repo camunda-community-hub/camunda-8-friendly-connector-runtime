@@ -68,9 +68,6 @@ function AdminNavbar() {
               </>
               : <></>
             }
-			<NavLink className={({ isActive }) =>
-              isActive ? "text-light menu-item selected" : "text-light menu-item"
-            } to="/admin/elementTemplate">{t("elementTemplate")}</NavLink>
           </div>
           : <></>}
       </nav>

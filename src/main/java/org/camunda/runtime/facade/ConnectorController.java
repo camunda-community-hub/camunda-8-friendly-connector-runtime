@@ -1,5 +1,6 @@
 package org.camunda.runtime.facade;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.camunda.runtime.service.ConnectorExecutionService;
 import org.camunda.runtime.service.ConnectorStorageService;
 import org.camunda.runtime.service.MonitoringService;
 import org.camunda.runtime.service.OutOfTheBoxConnectorService;
+import org.camunda.runtime.utils.ConnectorTemplateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +101,35 @@ public class ConnectorController extends AbstractController {
     return connectorStorageService.save(connector);
   }
 
+  @IsAuthenticated
+  @GetMapping("/{connector}/element-template")
+  @ResponseBody
+  public JsonNode eltTemplate(@PathVariable String connector) throws TechnicalException {
+    try {
+      return connectorStorageService.getEltTemplate(connector);
+    } catch (TechnicalException e) {
+      Connector con = connectorStorageService.findByName(connector);
+      return ConnectorTemplateUtils.generateElementTemplate(con);
+    }
+  }
+
+  @IsAdmin
+  @GetMapping("/new-element-template")
+  @ResponseBody
+  public JsonNode newEltTemplate() throws TechnicalException {
+    return null;
+  }
+
+  @IsAdmin
+  @PostMapping("/{connector}/element-template")
+  public void saveTemplate(@PathVariable String connector, @RequestBody JsonNode template)
+      throws TechnicalException {
+    Connector con = connectorStorageService.findByName(connector);
+    connectorStorageService.saveElementTemplate(con, template);
+    monitoringService.addAuditLog(
+        new AuditLog("CONNECTOR TEMPLATE SAVED", connector, getAuthenticatedUsername()));
+  }
+
   @PostMapping(
       value = "upload",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
@@ -147,7 +178,10 @@ public class ConnectorController extends AbstractController {
     monitoringService.addAuditLog(
         new AuditLog("CONNECTOR INSTALLED", connector.getName(), getAuthenticatedUsername()));
 
-    return connectorStorageService.save(connector);
+    connector = connectorStorageService.save(connector);
+    outOfTheBoxConnectorService.downloadElementTemplate(
+        connector, outOfTheBoxConnector.getName(), outOfTheBoxConnector.getRelease());
+    return connector;
   }
 
   @Override

@@ -232,6 +232,11 @@ tr.collapsed td > div {
     right: 400px;
     margin: 2px;
   }
+  .elementTemplate .templateEditor .saveTemplate {
+    position: absolute;
+    right: 490px;
+    margin: 2px;
+  }
 
   .elementTemplate .templateEditor .templateProperty0 {
     display: none;

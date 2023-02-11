@@ -120,6 +120,20 @@ export class ConnectorService {
       alert(error.message);
     })
   }
+  getEltTemplate = async (connector: string): Promise<any> => {
+    let { data } = await api.get('/connectors/'+ connector+'/element-template');
+    return data;
+  }
+  newEltTemplate = async (): Promise<any> => {
+    let { data } = await api.get('/connectors/new-element-template');
+    return data;
+  }
+  saveTemplate = async (connector: string|null, template: any): Promise<any> => {
+    api.post('/connectors/' + connector + '/element-template', template).then(response => {
+    }).catch(error => {
+      alert(error.message);
+    })
+  }
 }
 
 const connectorService = new ConnectorService();

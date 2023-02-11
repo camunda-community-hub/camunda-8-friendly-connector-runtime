@@ -6,16 +6,20 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
-import Card from 'react-bootstrap/Card';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import connectorService from '../service/ConnectorService';
+import { useTranslation } from "react-i18next";
 
 function ElementTemplate() {
+  const { t } = useTranslation();
   const user = useSelector((state: any) => state.auth.data)
   const diagramContainer = React.useRef<HTMLInputElement>(null);
   const panelContainer = React.useRef<HTMLInputElement>(null);
   let task = { "current": null };
   const [modeler, setModeler] = useState<any>(null);
+  const [connector, setConnector] = useState<string | null>(null);
+  const [templateValue, setTemplateValue] = useState<any | null>(null);
 
 
   const update = (property: string, value: any) => {
@@ -52,6 +56,9 @@ function ElementTemplate() {
   }
   const addGroup = () => {
     let copy = Object.assign({}, templateValue);
+    if (!copy.groups) {
+      copy.groups = [];
+    }
     copy.groups.push({
       "id": "group" + (copy.groups.length + 1),
       "label": "Group " + (copy.groups.length + 1)
@@ -93,7 +100,11 @@ function ElementTemplate() {
   }
   const updateInput = (index: number, property: string, value: string) => {
     let copy = Object.assign({}, templateValue);
-    copy.properties[index][property] = value;
+    if (value == "setGroupNull") {
+      delete copy.properties[index][property];
+    } else {
+      copy.properties[index][property] = value;
+    }
     if (copy.properties[index].type != 'String' && copy.properties[index].type != 'Text' && copy.properties[index].feel) {
       delete copy.properties[index].feel;
     }
@@ -292,40 +303,18 @@ function ElementTemplate() {
     a.remove();
 
   }
+  const loadEltTemplate = async () => {
+    let url = window.location.href;
+    let lastElt = url.substring(url.lastIndexOf("/") + 1, url.length);
+    if (lastElt != '' && lastElt != 'elementTemplate') {
+      setConnector(lastElt);
+      setTemplateValue(await connectorService.getEltTemplate(lastElt));
+    } else {
+      setTemplateValue(await connectorService.newEltTemplate());
+    }
+  }
 
-  const [templateValue, setTemplateValue] = useState<any>({
-    "$schema": "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
-    "name": "template-connector.json",
-    "id": crypto.randomUUID(),
-    "description": "Describe this connector",
-    "version": 1,
-    "documentationRef": "https://docs.camunda.io/docs/components/connectors/out-of-the-box-connectors/available-connectors-overview/",
-    "icon": {
-      "contents": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20height%3D%2218%22%20width%3D%2218%22%20viewBox%3D%220%200%2010%2010%22%20shape-rendering%3D%22geometricPrecision%22%3E%3Ctitle%3ESlack%3C%2Ftitle%3E%3Cg%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M0%2C0%20L0%2C10%20L10%2C10%20L10%2C0%20z%22%20fill%3D%22%23ecb12f%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E"
-    },
-    "category": {
-      "id": "connectors",
-      "name": "Connectors"
-    },
-    "appliesTo": [
-      "bpmn:Task"
-    ],
-    "elementType": {
-      "value": "bpmn:ServiceTask"
-    },
-    "groups": [],
-    "properties": [
-      {
-        "type": "Hidden",
-        "value": "io.camunda:template:1",
-        "binding": {
-          "type": "zeebe:taskDefinition:type"
-        }
-      }
-    ]
-  });
-
-  useEffect(() => {
+  const buildModeler = () => {
     if (panelContainer.current?.hasChildNodes()) {
       panelContainer.current?.removeChild(panelContainer.current.children[0]);
     }
@@ -340,6 +329,13 @@ function ElementTemplate() {
         }
       })
     );
+  }
+
+  useEffect(() => {
+    if (templateValue == null) {
+      loadEltTemplate();
+    }
+    buildModeler();
   }, []);
 
   // initially select the task to put properties panel preview in correct state
@@ -422,9 +418,17 @@ function ElementTemplate() {
 </definitions> `
 
 
-  return (<div className="elementTemplate">
-    <div className="templateEditor">
-      <Button variant="primary" onClick={(evt) => download()} className="downloadJson"><i className="bi bi-download"></i> JSON</Button>
+  return (
+   
+      <div className="elementTemplate">
+      <div className="templateEditor">
+        {templateValue ? <>
+          {user.profile == 'Admin' ?
+            <Button variant="primary" onClick={(evt) => connectorService.saveTemplate(connector, templateValue)} className="saveTemplate"><i className="bi bi-save"></i> {t("Save")}</Button>
+            :
+            <></>
+          }
+            <Button variant="primary" onClick={(evt) => download()} className="downloadJson"><i className="bi bi-download"></i> JSON</Button>
       <Tabs defaultActiveKey="general">
         <Tab eventKey="general" title="General">
           <InputGroup className="mb-3">
@@ -438,14 +442,20 @@ function ElementTemplate() {
           <InputGroup className="mb-3">
             <InputGroup.Text>Description</InputGroup.Text>
             <Form.Control aria-label="Description" readOnly={user.profile != 'Admin'} value={templateValue.description} onChange={(evt) => update('description', evt.target.value)} />
-          </InputGroup>
-          <InputGroup className="mb-3">
-            <InputGroup.Text>Icon</InputGroup.Text>
-            <Form.Control aria-label="file" type="file" id="uploadIcon" onChange={loadIcon} />
-          </InputGroup>
+              </InputGroup>
+              {user.profile == 'Admin' ?
+                <InputGroup className="mb-3">
+                  <InputGroup.Text>Icon</InputGroup.Text>
+
+                  <Form.Control aria-label="file" type="file" id="uploadIcon" onChange={loadIcon} />
+
+                </InputGroup>
+                :
+                <></>
+              }
           <InputGroup className="mb-3">
             <InputGroup.Text>Version</InputGroup.Text>
-            <Form.Control aria-label="version" type="number" id="version" value={templateValue.version} onChange={(evt) => updateNumber('version', evt.target.value)} />
+                <Form.Control aria-label="version" readOnly={user.profile != 'Admin'} type="number" id="version" value={templateValue.version} onChange={(evt) => updateNumber('version', evt.target.value)} />
           </InputGroup>
           <InputGroup className="mb-3">
             <InputGroup.Text>Element type</InputGroup.Text>
@@ -521,6 +531,7 @@ function ElementTemplate() {
                           <InputGroup className="mb-1">
                             <InputGroup.Text>Group</InputGroup.Text>
                             <Form.Select disabled={user.profile != 'Admin'} value={input.group} onChange={(evt) => updateInput(index, 'group', evt.target.value)}>
+                              <option value="setGroupNull">Custom properties</option>
                               {templateValue.groups ? templateValue.groups.map((group: any, indexGroup: number) =>
                                 <option key={indexGroup} value={group.id}>{group.label}</option>
                               )
@@ -643,7 +654,7 @@ function ElementTemplate() {
                       </tr>
                       <tr>
                         <td colSpan={3}>
-                          <Form.Check
+                          <Form.Check disabled={user.profile != 'Admin'}
                             type="switch" checked={templateValue.properties[index].condition} onChange={(evt) => swicthCondition(index, evt.target.checked)}
                             label="Conditional display" />
                           {templateValue.properties[index].condition ?
@@ -710,16 +721,16 @@ function ElementTemplate() {
                       </tr>
                       <tr>
                         <td colSpan={3}>
-                          <Form.Check
+                          <Form.Check disabled={user.profile != 'Admin'}
                             type="switch" checked={templateValue.properties[index].constraints} onChange={(evt) => swicthConstraints(index, evt.target.checked)}
                             label="Has constraints" />
                           {templateValue.properties[index].constraints ?
                             <>
-                              <Form.Check
+                              <Form.Check disabled={user.profile != 'Admin'}
                                 type="switch" checked={templateValue.properties[index].constraints.notEmpty} onChange={(evt) => swicthNotEmpty(index, evt.target.checked)}
                                 label="Should not be empty" />
 
-                              <Form.Check
+                              <Form.Check disabled={user.profile != 'Admin'}
                                 type="switch" checked={templateValue.properties[index].constraints.pattern} onChange={(evt) => swicthPattern(index, evt.target.checked)}
                                 label="Should respect a pattern" />
 
@@ -755,11 +766,12 @@ function ElementTemplate() {
             ) : <></>}
           </Accordion>
         </Tab>
-      </Tabs>
-    </div>
+        </Tabs>
+        </> : <></>}
+    </div >
     <div className="diagram" ref={diagramContainer} />
     <div className="panel" ref={panelContainer} />
-  </div>
+      </div >
   );
 }
 

@@ -50,6 +50,7 @@ function App() {
             <Route path="translations" element={<AdminTranslations />} />
             <Route path="connectorErrors/*" element={<ConnectorErrors />} />
             <Route path="elementTemplate" element={<ElementTemplate />} />
+            <Route path="elementTemplate/*" element={<ElementTemplate />} />
             <Route path="*" element={<Undefined />} />
           </Route>
         </Routes>

@@ -1,5 +1,6 @@
 package org.camunda.runtime.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import io.camunda.connector.api.annotation.OutboundConnector;
 import java.io.File;
@@ -36,7 +37,11 @@ public class ConnectorStorageService {
   private String workspace;
 
   public Path resolve(String name) {
-    return Path.of(workspace).resolve(CONNECTORS).resolve(name);
+    return Path.of(workspace).resolve(CONNECTORS).resolve(name).resolve("connector.json");
+  }
+
+  public Path resolveEltTemplate(String name) {
+    return Path.of(workspace).resolve(CONNECTORS).resolve(name).resolve("element-template.json");
   }
 
   public List<Connector> all() throws TechnicalException {
@@ -151,6 +156,23 @@ public class ConnectorStorageService {
       loader.close();
     } catch (IOException | ClassNotFoundException e) {
 
+    }
+  }
+
+  public void saveElementTemplate(Connector connector, JsonNode elementTemplateTree)
+      throws TechnicalException {
+    try {
+      JsonUtils.toJsonFile(resolveEltTemplate(connector.getName()), elementTemplateTree);
+    } catch (IOException e) {
+      throw new TechnicalException("Error saving the element template " + connector.getName(), e);
+    }
+  }
+
+  public JsonNode getEltTemplate(String name) throws TechnicalException {
+    try {
+      return JsonUtils.fromJsonFile(resolveEltTemplate(name), JsonNode.class);
+    } catch (IOException e) {
+      throw new TechnicalException("Error reading the element template " + name, e);
     }
   }
 }

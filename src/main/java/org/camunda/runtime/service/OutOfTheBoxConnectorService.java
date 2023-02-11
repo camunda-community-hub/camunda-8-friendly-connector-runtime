@@ -110,6 +110,11 @@ public class OutOfTheBoxConnectorService {
     }
   }
 
+  public void downloadElementTemplate(Connector connector, String name, String release) {
+    JsonNode elementTemplateTree = getElementTemplate(name, release);
+    connectorStorageService.saveElementTemplate(connector, elementTemplateTree);
+  }
+
   private JsonNode getElementTemplate(String name, String release) {
     String connectorUrl = releaseConnectors.get(release).get(name);
     JsonNode tree = get(connectorUrl);
