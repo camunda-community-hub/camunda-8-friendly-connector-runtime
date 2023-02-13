@@ -54,7 +54,7 @@ public class SecretsController extends AbstractController {
   }
 
   @IsAdmin
-  @DeleteMapping("/delete/{key}")
+  @DeleteMapping("/{key}")
   public void deleteSecret(@PathVariable String key) {
     secretsService.removeSecret(key);
     syncService.shareSecretWithOtherMembers(secretsService.getSecrets());
