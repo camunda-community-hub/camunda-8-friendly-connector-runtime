@@ -21,7 +21,7 @@
     <spring-zeebe.version>8.1.10</spring-zeebe.version>
     <zeebe.version>8.1.6</zeebe.version>
     <!-- connector SDK version -->
-    <version.connector-core>0.4.0</version.connector-core>
+    <version.connector-core>0.6.0</version.connector-core>
     <!-- other dependencies -->
     <hazelcast.version>4.2.6</hazelcast.version>
   </properties>
