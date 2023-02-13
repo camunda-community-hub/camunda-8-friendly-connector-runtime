@@ -10,7 +10,30 @@ This project is made to provide a connector runtime with a simple UI to deploy, 
 
 This repository contains a Java application built with Spring Boot and Zeebe Spring client to act as a connector runtime for Camunda Platform 8.
 
-It also contains a [React front-end](src/main/front/) that you can execute independently (npm run start) or serve from the spring boot application (you should run a `mvnw package` at the project root).
+It also contains a [React front-end](src/main/front/) that you can execute independently (npm run start) or serve from the spring boot application (you should first run a `mvnw package` at the project root).
+
+## Features
+- You can execute and stop custom or "out of the box" connectors built on top of the [Connector SDK](https://github.com/camunda/connector-sdk)
+    <img src="/docs/installedConnectors.png" height="200">
+  - To install a new custom connector, click on "New connector" and upload your JAR packaged with dependencies. It will automatically compute all required informations.
+ 
+    <img src="/docs/installCustomConnector.png" height="200">
+  - To install a new OOTB connector, click on "Camunda connector". In the popup, change the release version (latest is the default), refresh the list and click on the install button in front of the connector you need.
+  
+    <img src="/docs/installOotbConnector.png" height="200">
+  - Remember to start/stop your connectors after installation.
+- You can manage secrets for your connectors. These connectors can be kept or in memory. If you store them on disk, you can choose to encrypt them. A private key will be shared with you in a popup. If the application stops and restarts, you will need to provide this private key to restore the secrets.
+
+    <img src="/docs/secrets.png" height="200">
+- To mitigate that "issue", you can also run it as a cluster. The replicas will share any secret updates between each other via socket encrypted messages. To discover each other, cluster members register themselves in an embedded hazelcast cache. As long as a node is alive, new nodes will get updated on startup and it will not be required to provide the private key for decryption.
+- You can monitor connector executions. In case of errors, you can retrieve connector context, fetched variables, duration, error message, etc. For successful executions, we measure execution times. You also have some "audit logs" : who installed, removed, started, stoped connectors, changed secrets, etc.
+
+    <img src="/docs/monitoring.png" height="150">
+    <img src="/docs/errors.png" height="150">
+    <img src="/docs/duration.png" height="150">
+- You can download connector element templates. You can also edit them. In case of custom connector, the element template is pre-generated for you and you can update it on demand.
+
+    <img src="/docs/editElementTemplate.png" height="200">
 
 ## First steps with the application
 
