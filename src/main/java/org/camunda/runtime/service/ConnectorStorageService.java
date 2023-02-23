@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.annotation.PostConstruct;
+import org.apache.commons.io.FileUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.camunda.runtime.exception.TechnicalException;
 import org.camunda.runtime.jsonmodel.Connector;
@@ -102,7 +103,7 @@ public class ConnectorStorageService {
 
   public void deleteByName(String name) throws TechnicalException {
     try {
-      Files.delete(resolve(name));
+      FileUtils.deleteDirectory(Path.of(workspace).resolve(CONNECTORS).resolve(name).toFile());
     } catch (IOException e) {
       throw new TechnicalException("Error storing the library", e);
     }

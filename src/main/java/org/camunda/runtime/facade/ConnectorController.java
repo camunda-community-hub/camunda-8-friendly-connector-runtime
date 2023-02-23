@@ -67,6 +67,10 @@ public class ConnectorController extends AbstractController {
   @IsAdmin
   @DeleteMapping("/{name}")
   public void delete(@PathVariable String name) throws TechnicalException {
+    Connector connector = connectorStorageService.findByName(name);
+    if (connector.isStarted()) {
+      connectorExecutionService.stop(connector);
+    }
     connectorStorageService.deleteByName(name);
     monitoringService.addAuditLog(
         new AuditLog("CONNECTOR DELETION", name, getAuthenticatedUsername()));
