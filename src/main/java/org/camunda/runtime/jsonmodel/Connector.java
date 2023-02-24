@@ -23,6 +23,8 @@ public class Connector implements Serializable {
 
   private String jarFile;
 
+  private String icon;
+
   public Connector() {}
 
   public Connector(String name, String jarFile) {
@@ -89,5 +91,13 @@ public class Connector implements Serializable {
 
   public void setStarted(boolean started) {
     this.started = started;
+  }
+
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 }

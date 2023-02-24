@@ -50,7 +50,16 @@ public class ConnectorStorageService {
     List<Connector> connectors = new ArrayList<>();
     for (File file : connectorFiles) {
       if (!file.getName().equals(JARS) && !file.getName().equals("secrets.json")) {
-        connectors.add(findByName(file.getName()));
+        Connector connector = findByName(file.getName());
+        try {
+          JsonNode template = getEltTemplate(file.getName());
+          if (template.get("icon") != null && template.get("icon").get("contents") != null) {
+            connector.setIcon(template.get("icon").get("contents").asText());
+          }
+        } catch (TechnicalException e) {
+
+        }
+        connectors.add(connector);
       }
     }
     return connectors;

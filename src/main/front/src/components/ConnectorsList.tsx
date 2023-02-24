@@ -67,34 +67,38 @@ function ConnectorsList() {
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th scope="col">{t("Name")}</th>
-            <th scope="col">{t("Status")}</th>
+            <th scope="col">{t("Connector")}</th>
             <th scope="col">{t("Actions")}</th>
           </tr>
         </thead>
         <tbody>
           {connectors ? connectors.map((connector: any, index: number) =>
             <tr key={connector.name}>
-              <td>{connector.name}</td>
-              <td>{connector.started ? t("Running") : t("Paused")}</td>
+              <td><div className={connector.started ? "connector running" : "connector paused"}>
+                {connector.icon ? <img src={connector.icon} height="20px"/> : <></>}
+                {connector.name}
+                <div className="state">{connector.started ? t("Running") : t("Paused")}</div>
+              </div>
+              </td>
               <td>
-                <Button variant="primary" className="me-1" onClick={() => dispatch(connectorService.open(connector.name))}><i className="bi bi-pencil"></i> {t("Open")}</Button>
-                <Link className="btn btn-primary me-1" to={"/admin/elementTemplate/" + connector.name}><i className="bi bi-pencil"></i> {t("Element template")}</Link>
+                {user.profile == 'Admin' ?
+                    connector.started ?
+                      <Button variant="warning" className="me-1" onClick={() => dispatch(connectorService.stop(connector.name))}><i className="bi bi-stop"></i></Button>
+                      :
+                      <Button variant="success" className="me-1" onClick={() => dispatch(connectorService.start(connector.name))}><i className="bi bi-play"></i></Button>
+                  :
+                  <></>
+                }
+                <Button variant="primary" className="me-1" onClick={() => dispatch(connectorService.open(connector.name))}><i className="bi bi-pencil"></i> {t("Properties")}</Button>
                 {user.profile == 'Admin' ?
                   <>
-                     {connector.started ?
-                      <Button variant="warning" className="me-1" onClick={() => dispatch(connectorService.stop(connector.name))}><i className="bi bi-stop"></i> {t("Stop")}</Button>
-                      :
-                      <Button variant="success" className="me-1" onClick={() => dispatch(connectorService.start(connector.name))}><i className="bi bi-play"></i> {t("Execute")}</Button>
-                    }
-                    <Button variant="danger" className="me-1" onClick={() => dispatch(connectorService.delete(connector.name))}><i className="bi bi-trash"></i> {t("Delete")}</Button>
+                    <Link className="btn btn-primary me-1" to={"/admin/elementTemplate/" + connector.name}><i className="bi bi-pencil"></i> {t("Element template")}</Link>
+                    <Button variant="danger" className="me-1" onClick={() => dispatch(connectorService.delete(connector.name))}><i className="bi bi-trash"></i></Button>
                   </>
                   :
-                  <Button variant="primary" className="me-1" onClick={() => dispatch(connectorService.open(connector.name))}><i className="bi bi-pencil"></i> {t("Open")}</Button>
-
+                  <></>
                 }
                 <Button variant="link" className="me-1" onClick={() => downloadEltTmplate(connector.name)}><i className="bi bi-download"></i> {t("Element template")}</Button>
-                <Link to={"/admin/connectorErrors/" + connector.name}><i className="bi bi-bug"></i> {t("Errors")}</Link>
               </td>
             </tr>)
             : <></>}

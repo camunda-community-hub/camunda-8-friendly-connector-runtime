@@ -209,7 +209,29 @@ tr.collapsed td > div {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* connectors list*/
+.connector {
+  background: white;
+  border: 1px solid gray;
+  text-align: center;
+}
 
+  .connector.running {
+    border: 1px solid green;
+  }
+
+  .connector .state {
+    color: white;
+    text-align: center;
+  }
+
+  .connector.running .state {
+    background: green;
+  }
+
+  .connector.paused .state {
+    background: gray;
+  }
 /*elements templates*/
 .elementTemplate {
   margin-left: -12px;
@@ -227,20 +249,22 @@ tr.collapsed td > div {
     float: left;
     overflow-y: auto;
   }
-  .elementTemplate .templateEditor .downloadJson {
-    position: absolute;
-    right: 400px;
-    margin: 2px;
-  }
-  .elementTemplate .templateEditor .saveTemplate {
-    position: absolute;
-    right: 490px;
-    margin: 2px;
-  }
 
-  .elementTemplate .templateEditor .templateProperty0 {
-    display: none;
-  }
+    .elementTemplate .templateEditor .downloadJson {
+      position: absolute;
+      right: 400px;
+      margin: 2px;
+    }
+
+    .elementTemplate .templateEditor .saveTemplate {
+      position: absolute;
+      right: 490px;
+      margin: 2px;
+    }
+
+    .elementTemplate .templateEditor .templateProperty0 {
+      display: none;
+    }
 
   .elementTemplate .diagram {
     display: none;
