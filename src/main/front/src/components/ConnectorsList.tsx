@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import connectorService from '../service/ConnectorService';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -61,9 +62,13 @@ function ConnectorsList() {
   return (
     <div>
       <br />
-      <Button variant="primary" onClick={() => dispatch(connectorService.new())}><i className="bi bi-plus-square"></i> {t("New connector")}</Button>
-      <Button variant="secondary" onClick={() => openOotbModal()}><i className="bi bi-download"></i> {t("Connectors Camunda")}</Button>
-
+      {user.profile == 'Admin' ?
+        <>
+          <Button variant="primary" onClick={() => dispatch(connectorService.new())}><i className="bi bi-plus-square"></i> {t("New connector")}</Button>
+          <Button variant="secondary" onClick={() => openOotbModal()}><i className="bi bi-download"></i> {t("Connectors Camunda")}</Button>
+        </>
+        : <></>
+      }
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -75,30 +80,32 @@ function ConnectorsList() {
           {connectors ? connectors.map((connector: any, index: number) =>
             <tr key={connector.name}>
               <td><div className={connector.started ? "connector running" : "connector paused"}>
-                {connector.icon ? <img src={connector.icon} height="20px"/> : <></>}
+                {connector.icon ? <img src={connector.icon} height="20px" /> : <></>}
                 {connector.name}
                 <div className="state">{connector.started ? t("Running") : t("Paused")}</div>
               </div>
               </td>
               <td>
                 {user.profile == 'Admin' ?
-                    connector.started ?
-                      <Button variant="warning" className="me-1" onClick={() => dispatch(connectorService.stop(connector.name))}><i className="bi bi-stop"></i></Button>
-                      :
-                      <Button variant="success" className="me-1" onClick={() => dispatch(connectorService.start(connector.name))}><i className="bi bi-play"></i></Button>
+                  connector.started ?
+                    <Button variant="warning" className="me-1" onClick={() => dispatch(connectorService.stop(connector.name))}><i className="bi bi-stop"></i></Button>
+                    :
+                    <Button variant="success" className="me-1" onClick={() => dispatch(connectorService.start(connector.name))}><i className="bi bi-play"></i></Button>
                   :
                   <></>
                 }
                 <Button variant="primary" className="me-1" onClick={() => dispatch(connectorService.open(connector.name))}><i className="bi bi-pencil"></i> {t("Properties")}</Button>
                 {user.profile == 'Admin' ?
                   <>
-                    <Link className="btn btn-primary me-1" to={"/admin/elementTemplate/" + connector.name}><i className="bi bi-pencil"></i> {t("Element template")}</Link>
+                    <ButtonGroup className="me-1">
+                      <Link className="btn btn-primary" to={"/admin/elementTemplate/" + connector.name}><i className="bi bi-pencil"></i></Link>
+                      <Button variant="primary" onClick={() => downloadEltTmplate(connector.name)}><i className="bi bi-download"></i> {t("Element template")}</Button>
+                    </ButtonGroup>
                     <Button variant="danger" className="me-1" onClick={() => dispatch(connectorService.delete(connector.name))}><i className="bi bi-trash"></i></Button>
                   </>
                   :
-                  <></>
+                  <Button variant="primary" className="me-1" onClick={() => downloadEltTmplate(connector.name)}><i className="bi bi-download"></i> {t("Element template")}</Button>
                 }
-                <Button variant="link" className="me-1" onClick={() => downloadEltTmplate(connector.name)}><i className="bi bi-download"></i> {t("Element template")}</Button>
               </td>
             </tr>)
             : <></>}
