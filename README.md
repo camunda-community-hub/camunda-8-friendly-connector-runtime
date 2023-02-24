@@ -4,7 +4,13 @@
 
 # Friendly connector runtime for Camunda Platform 8 using React, Java and Spring Boot
 
-This project is made to provide a connector runtime with a simple UI to deploy, start, stop and delete connector implementations and manage secrets.
+This project is made to provide a connector runtime with a simple UI to :
+- deploy, start, stop and delete connectors.
+- manage secrets.
+- generate and update element templates.
+- monitor executions.
+
+:information_source: This is a community project that you can use during exploration phase, PoCs, trainings, etc. It's **not production ready** and you should carefully review it before using it in production.
 
 ## Repository content
 
@@ -21,7 +27,8 @@ It also contains a [React front-end](src/main/front/) that you can execute indep
   - To install a new OOTB connector, click on "Camunda connector". In the popup, change the release version (latest is the default), refresh the list and click on the install button in front of the connector you need.
   
     <img src="/docs/installOotbConnector.png" height="200">
-  - Remember to start/stop your connectors after installation.
+    
+    :information_source: Remember to start/stop your connectors after installation.
 - You can manage secrets for your connectors. These connectors can be kept or in memory. If you store them on disk, you can choose to encrypt them. A private key will be shared with you in a popup. If the application stops and restarts, you will need to provide this private key to restore the secrets.
 
     <img src="/docs/secrets.png" height="200">
